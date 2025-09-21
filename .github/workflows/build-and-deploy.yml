@@ -1,0 +1,256 @@
+name: Build and Deploy Baby Care App
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+env:
+  FLUTTER_VERSION: '3.16.0'
+  JAVA_VERSION: '17'
+
+jobs:
+  # Test and validate code
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed lib/
+
+      - name: Analyze project source
+        run: flutter analyze --fatal-infos
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage/lcov.info
+
+  # Build Android APK and AAB
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Setup Android signing (for release builds)
+      - name: Setup Android signing
+        if: github.event_name == 'release'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/app/keystore.jks
+          echo "storeFile=keystore.jks" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+
+      # Build debug APK for development
+      - name: Build debug APK
+        if: github.event_name != 'release'
+        run: flutter build apk --debug --split-per-abi
+
+      # Build release APK and AAB for production
+      - name: Build release APK
+        if: github.event_name == 'release'
+        run: flutter build apk --release --split-per-abi
+
+      - name: Build release AAB
+        if: github.event_name == 'release'
+        run: flutter build appbundle --release
+
+      # Upload build artifacts
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+          retention-days: 30
+
+      - name: Upload AAB artifacts
+        if: github.event_name == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: |
+            build/app/outputs/bundle/release/*.aab
+          retention-days: 30
+
+      # Upload to release if this is a release build
+      - name: Upload APK to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/release/*.aab
+
+  # Build iOS (requires macOS runner)
+  build-ios:
+    name: Build iOS
+    runs-on: macos-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build iOS (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Create iOS archive
+        run: |
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath Runner.xcarchive \
+            archive
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: ios/Runner.xcarchive
+          retention-days: 30
+
+  # Build Web version
+  build-web:
+    name: Build Web
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build web
+        run: flutter build web --release --base-href "/baby-care-app/"
+
+      - name: Upload web artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web/
+          retention-days: 30
+
+      # Deploy to GitHub Pages (optional)
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
+
+  # Create pre-release for develop branch
+  create-prerelease:
+    name: Create Pre-release
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios, build-web]
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: ./apk
+
+      - name: Download Web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: ./web
+
+      - name: Create pre-release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: pre-${{ github.sha }}
+          name: Pre-release ${{ github.sha }}
+          prerelease: true
+          files: |
+            ./apk/*.apk
+          body: |
+            Pre-release build from develop branch
+            
+            **Changes:**
+            ${{ github.event.head_commit.message }}
+            
+            **Downloads:**
+            - APK files for Android testing
+            - Web version deployed to GitHub Pages
+
+  # Notify on build completion
+  notify:
+    name: Notify Build Status
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios, build-web]
+    if: always()
+    steps:
+      - name: Notify success
+        if: ${{ success() }}
+        run: |
+          echo "✅ All builds completed successfully!"
+          echo "- Android APK and AAB built"
+          echo "- iOS archive created"
+          echo "- Web version built"
+
+      - name: Notify failure
+        if: ${{ failure() }}
+        run: |
+          echo "❌ Build failed!"
+          echo "Check the logs for details."

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="BabyCare - A simple app to track your baby's feeding, urination, and stool patterns. Perfect for new parents!">
+  <meta name="keywords" content="baby care, feeding tracker, baby app, parenting, newborn care">
+  <meta name="author" content="BabyCare Team">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="BabyCare">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Android meta tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FFC0CB">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- PWA Meta Tags -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="manifest" href="manifest.json">
+
+  <title>BabyCare - Baby Feeding & Care Tracker</title>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourdomain.com/baby-care-app/">
+  <meta property="og:title" content="BabyCare - Baby Feeding & Care Tracker">
+  <meta property="og:description" content="Track your baby's feeding, urination, and stool patterns with our simple, privacy-first app.">
+  <meta property="og:image" content="https://yourdomain.com/baby-care-app/icons/Icon-512.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://yourdomain.com/baby-care-app/">
+  <meta property="twitter:title" content="BabyCare - Baby Feeding & Care Tracker">
+  <meta property="twitter:description" content="Track your baby's feeding, urination, and stool patterns with our simple, privacy-first app.">
+  <meta property="twitter:image" content="https://yourdomain.com/baby-care-app/icons/Icon-512.png">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="fonts/Nunito-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="fonts/Nunito-Bold.ttf" as="font" type="font/ttf" crossorigin>
+
+  <!-- Custom CSS for web-specific styling -->
+  <style>
+    /* Loading screen styles */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #FFC0CB 0%, #FFD6E8 100%);
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .loading-content {
+      text-align: center;
+      color: #333;
+    }
+
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    .loading-text {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .loading-subtitle {
+      font-size: 16px;
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 192, 203, 0.3);
+      border-top: 4px solid #FFC0CB;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Web-specific improvements */
+    body {
+      margin: 0;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #FFFFFF;
+    }
+
+    /* Custom scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #FFC0CB;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FFB6C1;
+    }
+
+    /* Responsive design helpers */
+    @media (max-width: 768px) {
+      .loading-logo {
+        width: 60px;
+        height: 60px;
+      }
+      .loading-text {
+        font-size: 20px;
+      }
+      .loading-subtitle {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loading screen -->
+  <div id="loading" class="loading">
+    <div class="loading-content">
+      <div class="loading-logo">🍼</div>
+      <div class="loading-text">BabyCare</div>
+      <div class="loading-subtitle">Loading your baby care companion...</div>
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
+  <!-- Service Worker Registration -->
+  <script>
+    // Register service worker for offline functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('flutter-first-frame', function () {
+        navigator.serviceWorker.register('flutter_service_worker.js');
+      });
+    }
+
+    // Hide loading screen when Flutter app loads
+    window.addEventListener('flutter-first-frame', function () {
+      const loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.opacity = '0';
+        setTimeout(() => {
+          loading.style.display = 'none';
+        }, 300);
+      }
+    });
+
+    // Web-specific features
+    window.addEventListener('DOMContentLoaded', function () {
+      // Add install prompt for PWA
+      let deferredPrompt;
+      
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show custom install button/banner if desired
+        console.log('PWA install prompt available');
+      });
+
+      // Handle PWA installation
+      window.addEventListener('appinstalled', () => {
+        console.log('BabyCare PWA was installed');
+        deferredPrompt = null;
+      });
+
+      // Analytics and error tracking (optional)
+      window.addEventListener('error', function(e) {
+        console.error('App error:', e.error);
+        // Could send to analytics service
+      });
+
+      // Handle offline/online status
+      window.addEventListener('online', function() {
+        console.log('App is back online');
+      });
+
+      window.addEventListener('offline', function() {
+        console.log('App is offline - data will sync when connection returns');
+      });
+    });
+
+    // Web notifications support
+    function requestNotificationPermission() {
+      if ('Notification' in window) {
+        if (Notification.permission === 'default') {
+          Notification.requestPermission().then(function(permission) {
+            console.log('Notification permission:', permission);
+          });
+        }
+      }
+    }
+
+    // Expose function for Flutter to call
+    window.showWebNotification = function(title, body, options = {}) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const notification = new Notification(title, {
+          body: body,
+          icon: 'icons/Icon-192.png',
+          badge: 'icons/Icon-192.png',
+          tag: 'baby-care-reminder',
+          requireInteraction: true,
+          ...options
+        });
+
+        notification.onclick = function() {
+          window.focus();
+          notification.close();
+        };
+
+        // Auto-close after 10 seconds
+        setTimeout(() => notification.close(), 10000);
+      }
+    };
+
+    // Web file sharing support
+    window.shareFile = async function(file, title, text) {
+      if (navigator.share && navigator.canShare) {
+        try {
+          await navigator.share({
+            title: title,
+            text: text,
+            files: [file]
+          });
+        } catch (err) {
+          console.log('Error sharing:', err);
+          // Fallback to download
+          downloadFile(file, title);
+        }
+      } else {
+        // Fallback to download
+        downloadFile(file, title);
+      }
+    };
+
+    function downloadFile(content, filename) {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Prevent right-click context menu (optional, for app-like feel)
+    // document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Handle keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      // Space bar to start/stop feeding (when not in input field)
+      if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+        // Send to Flutter
+        window.dispatchEvent(new CustomEvent('keyboard-shortcut', { 
+          detail: { key: 'space', action: 'toggle-feeding' } 
+        }));
+      }
+      
+      // 'U' key to log urine
+      if (e.key.toLowerCase() === 'u' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('keyboard-shortcut', { 
+          detail: { key: 'u', action: 'log-urine' } 
+        }));
+      }
+      
+      // 'S' key to log stool  
+      if (e.key.toLowerCase() === 's' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('keyboard-shortcut', { 
+          detail: { key: 's', action: 'log-stool' } 
+        }));
+      }
+    });
+  </script>
+
+  <!-- Flutter Web Bootstrap -->
+  <script src="flutter_bootstrap.js" async></script>
+
+  <!-- Web Analytics (optional - replace with your tracking ID) -->
+  <!-- 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_TRACKING_ID');
+  </script>
+  -->
+
+</body>
+</html>

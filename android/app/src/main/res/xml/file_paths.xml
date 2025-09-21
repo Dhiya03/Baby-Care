@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Internal app storage -->
+    <files-path name="internal_files" path="." />
+    
+    <!-- Baby history folder -->
+    <files-path name="baby_history" path="BabyHistory/" />
+    
+    <!-- Cache directory for temporary files -->
+    <cache-path name="cache" path="." />
+    
+    <!-- External files directory (if available) -->
+    <external-files-path name="external_files" path="." />
+    
+    <!-- External cache directory -->
+    <external-cache-path name="external_cache" path="." />
+    
+    <!-- Downloads folder (for exports) -->
+    <external-path name="external_downloads" path="Download/" />
+    
+    <!-- Documents folder -->
+    <external-path name="external_documents" path="Documents/" />
+</paths>

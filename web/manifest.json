@@ -1,0 +1,169 @@
+{
+    "name": "BabyCare - Baby Feeding & Care Tracker",
+    "short_name": "BabyCare",
+    "description": "Track your baby's feeding, urination, and stool patterns with our simple, privacy-first app. Perfect for new parents!",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#FFFFFF",
+    "theme_color": "#FFC0CB",
+    "orientation": "portrait-primary",
+    "scope": "./",
+    "lang": "en",
+    "categories": ["medical", "lifestyle", "utilities"],
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshots/home-mobile.png",
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Home screen showing feeding, urine, and stool tracking buttons"
+        },
+        {
+            "src": "screenshots/history-mobile.png", 
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Daily history view with feeding sessions and logs"
+        },
+        {
+            "src": "screenshots/timer-mobile.png",
+            "sizes": "390x844", 
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Active feeding timer with duration display"
+        },
+        {
+            "src": "screenshots/home-desktop.png",
+            "sizes": "1280x720",
+            "type": "image/png", 
+            "form_factor": "wide",
+            "label": "Desktop view of the baby care dashboard"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Start Feeding",
+            "short_name": "Feed",
+            "description": "Start a new feeding session",
+            "url": "./?action=start-feeding",
+            "icons": [
+                {
+                    "src": "icons/shortcuts/feeding-96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Log Urine", 
+            "short_name": "Urine",
+            "description": "Quickly log urination",
+            "url": "./?action=log-urine",
+            "icons": [
+                {
+                    "src": "icons/shortcuts/urine-96.png", 
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Log Stool",
+            "short_name": "Stool", 
+            "description": "Quickly log stool",
+            "url": "./?action=log-stool",
+            "icons": [
+                {
+                    "src": "icons/shortcuts/stool-96.png",
+                    "sizes": "96x96" 
+                }
+            ]
+        },
+        {
+            "name": "View History",
+            "short_name": "History",
+            "description": "View baby care history", 
+            "url": "./?action=view-history",
+            "icons": [
+                {
+                    "src": "icons/shortcuts/history-96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=com.babycareapp.baby_care_app",
+            "id": "com.babycareapp.baby_care_app"
+        },
+        {
+            "platform": "itunes",
+            "url": "https://apps.apple.com/app/baby-care/id123456789"
+        }
+    ],
+    "prefer_related_applications": false,
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "launch_handler": {
+        "client_mode": "focus-existing"
+    },
+    "file_handlers": [
+        {
+            "action": "./",
+            "accept": {
+                "text/plain": [".txt"],
+                "application/octet-stream": [".txt"]
+            },
+            "launch_type": "single-client"
+        }
+    ],
+    "protocol_handlers": [
+        {
+            "protocol": "babycare",
+            "url": "./?protocol=%s"
+        }
+    ],
+    "share_target": {
+        "action": "./share/",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text", 
+            "url": "url",
+            "files": [
+                {
+                    "name": "files",
+                    "accept": ["text/plain", ".txt"]
+                }
+            ]
+        }
+    }
+}
