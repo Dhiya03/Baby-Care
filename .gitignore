@@ -386,3 +386,5 @@ override_config.dart
 
 # Profiling data
 *.prof
+
+pubspec.lock
