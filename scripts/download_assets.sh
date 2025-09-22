@@ -25,31 +25,17 @@ mkdir -p assets/images/illustrations
 mkdir -p assets/images/app_icon
 mkdir -p assets/animations
 
-# Download Nunito fonts from Google Fonts
-echo -e "${BLUE}📝 Downloading Nunito fonts...${NC}"
-cd assets/fonts/Nunito
-
-# Download font files
-URL_REGULAR="https://fonts.gstatic.com/s/nunito/v27/XRXV3I6Li01BKofINeaB.ttf"
-URL_BOLD="https://fonts.gstatic.com/s/nunito/v27/XRXV3I6Li01BKofIOOaB.ttf"
-URL_LIGHT="https://fonts.gstatic.com/s/nunito/v27/XRXV3I6Li01BKofINeaE.ttf"
-URL_OFL="https://fonts.gstatic.com/s/nunito/v27/OFL.txt"
-
-echo "Downloading from ${URL_REGULAR}..."
-curl -fL -o Nunito-Regular.ttf "$URL_REGULAR"
-echo "Downloading from ${URL_BOLD}..."
-curl -fL -o Nunito-Bold.ttf "$URL_BOLD"
-echo "Downloading from ${URL_LIGHT}..."
-curl -fL -o Nunito-Light.ttf "$URL_LIGHT"
-
-# Download Open Font License
-echo "Downloading from ${URL_OFL}..."
-curl -fL -o OFL.txt "$URL_OFL"
-
-echo -e "${GREEN}✅ Nunito fonts downloaded${NC}"
+# Verify that fonts exist in the repository
+echo -e "${BLUE}📝 Verifying local fonts...${NC}"
+if [ -f "assets/fonts/Nunito/Nunito-Regular.ttf" ] && [ -f "assets/fonts/Nunito/Nunito-Bold.ttf" ] && [ -f "assets/fonts/Nunito/Nunito-Light.ttf" ]; then
+    echo -e "${GREEN}✅ Nunito font files found in repository.${NC}"
+else
+    echo -e "${RED}❌ Error: Nunito font files not found!${NC}"
+    echo -e "${YELLOW}Please download the Nunito font family from Google Fonts and place the .ttf files in 'assets/fonts/Nunito/' before committing.${NC}"
+    exit 1
+fi
 
 # Go back to project root
-cd ../../../
 
 # Create placeholder icons using ImageMagick (if available)
 if command -v convert &> /dev/null; then
@@ -232,25 +218,6 @@ cat > assets/animations/feeding_timer.json << 'EOF'
   "layers": []
 }
 EOF
-
-# Update pubspec.yaml to include assets
-echo -e "${BLUE}📝 Updating pubspec.yaml...${NC}"
-if grep -q "assets:" pubspec.yaml; then
-    echo -e "${YELLOW}Assets section already exists in pubspec.yaml${NC}"
-else
-    echo -e "${YELLOW}Adding assets section to pubspec.yaml...${NC}"
-    cat >> pubspec.yaml << 'EOF'
-
-  assets:
-    - assets/icons/
-    - assets/fonts/
-    - assets/images/
-    - assets/images/splash/
-    - assets/images/illustrations/
-    - assets/images/app_icon/
-    - assets/animations/
-EOF
-fi
 
 echo ""
 echo -e "${GREEN}🎉 Asset setup completed!${NC}"

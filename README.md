@@ -51,8 +51,14 @@ Follow these instructions to get the project up and running on your local machin
     cd Baby-Care
     ```
 
-2.  **Set up assets:**
-    The project uses a script to download fonts and create placeholder assets.
+2.  **Download Required Fonts:**
+    This project uses the Nunito font, which must be downloaded manually and placed in the `assets/fonts/Nunito/` directory.
+    - Go to Nunito on Google Fonts.
+    - Click "Get font" and then "Download all".
+    - Unzip the file and copy `Nunito-Regular.ttf`, `Nunito-Bold.ttf`, and `Nunito-Light.ttf` into `assets/fonts/Nunito/`.
+
+3.  **Set up placeholder assets:**
+    Run the asset script to verify fonts and create placeholders for other assets.
     ```sh
     # Make the script executable
     chmod +x scripts/download_assets.sh
@@ -61,12 +67,12 @@ Follow these instructions to get the project up and running on your local machin
     ./scripts/download_assets.sh
     ```
 
-3.  **Get dependencies:**
+4.  **Get dependencies:**
     ```sh
     flutter pub get
     ```
 
-4.  **Run the app:**
+5.  **Run the app:**
     ```sh
     flutter run
     ```
