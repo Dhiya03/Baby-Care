@@ -81,14 +81,14 @@ Follow these instructions to get the project up and running on your local machin
 
 ## 📦 Building for Production (Android)
 
-Here’s how to build the Android APK and App Bundle (AAB) for release.
+The easiest way to create a production build is by using the provided build script.
 
-### 1. Create a Keystore
+### 1. Using the Build Script (Recommended)
 
-If you don't have one, create a signing key using `keytool`.
+First, ensure you have set up your signing key by following the "Manual Build" steps below. Then, run the script:
 
 ```sh
-keytool -genkey -v -keystore keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias <your-key-alias>
+./scripts/build_scripts.sh android release
 ```
 
 Place the generated `keystore.jks` file inside the `android/app/` directory.
