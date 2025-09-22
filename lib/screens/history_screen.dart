@@ -379,3 +379,4 @@ class HistoryScreen extends ConsumerWidget {
       }
     }
   }
+}
