@@ -30,12 +30,21 @@ echo -e "${BLUE}📝 Downloading Nunito fonts...${NC}"
 cd assets/fonts/Nunito
 
 # Download font files
-curl -o Nunito-Regular.ttf "https://fonts.gstatic.com/s/nunito/v25/XRXV3I6Li01BKofINeaB.ttf"
-curl -o Nunito-Bold.ttf "https://fonts.gstatic.com/s/nunito/v25/XRXV3I6Li01BKofIOOaB.ttf"  
-curl -o Nunito-Light.ttf "https://fonts.gstatic.com/s/nunito/v25/XRXV3I6Li01BKofINeaE.ttf"
+URL_REGULAR="https://fonts.gstatic.com/s/nunito/v27/XRXV3I6Li01BKofINeaB.ttf"
+URL_BOLD="https://fonts.gstatic.com/s/nunito/v27/XRXV3I6Li01BKofIOOaB.ttf"
+URL_LIGHT="https://fonts.gstatic.com/s/nunito/v27/XRXV3I6Li01BKofINeaE.ttf"
+URL_OFL="https://fonts.gstatic.com/s/nunito/v27/OFL.txt"
+
+echo "Downloading from ${URL_REGULAR}..."
+curl -fL -o Nunito-Regular.ttf "$URL_REGULAR"
+echo "Downloading from ${URL_BOLD}..."
+curl -fL -o Nunito-Bold.ttf "$URL_BOLD"
+echo "Downloading from ${URL_LIGHT}..."
+curl -fL -o Nunito-Light.ttf "$URL_LIGHT"
 
 # Download Open Font License
-curl -o OFL.txt "https://fonts.gstatic.com/s/nunito/v25/OFL.txt"
+echo "Downloading from ${URL_OFL}..."
+curl -fL -o OFL.txt "$URL_OFL"
 
 echo -e "${GREEN}✅ Nunito fonts downloaded${NC}"
 

@@ -9,7 +9,7 @@ on:
     types: [ published ]
 
 env:
-  FLUTTER_VERSION: '3.22.2'
+  FLUTTER_VERSION: '3.35.4'
   JAVA_VERSION: '17'
 
 jobs:
@@ -79,42 +79,17 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: Flutter Doctor
-        run: flutter doctor -v
-
       - name: Clean
         run: flutter clean
 
       - name: Get dependencies
         run: flutter pub get
 
-      # Create missing directories
-      - name: Create asset directories
+      # Download/Create assets (including placeholders)
+      - name: Setup Assets
         run: |
-          mkdir -p assets/icons
-          mkdir -p assets/fonts/Nunito
-          mkdir -p assets/images/splash
-          mkdir -p assets/images/illustrations
-          mkdir -p assets/images/app_icon
-          mkdir -p assets/animations
-
-      # Create placeholder assets to prevent build failures
-      - name: Create placeholder assets
-        run: |
-          # Create placeholder font files
-          echo "# Placeholder font file" > assets/fonts/Nunito/Nunito-Regular.ttf
-          echo "# Placeholder font file" > assets/fonts/Nunito/Nunito-Bold.ttf
-          echo "# Placeholder font file" > assets/fonts/Nunito/Nunito-Light.ttf
-          
-          # Create placeholder images
-          echo "# Placeholder image" > assets/icons/bottle.png
-          echo "# Placeholder image" > assets/icons/droplet.png
-          echo "# Placeholder image" > assets/icons/poop.png
-          echo "# Placeholder image" > assets/icons/clock.png
-          echo "# Placeholder image" > assets/icons/history.png
-          echo "# Placeholder image" > assets/icons/settings.png
-          echo "# Placeholder image" > assets/icons/export.png
-          echo "# Placeholder image" > assets/icons/notification.png
+          chmod +x scripts/download_assets.sh
+          ./scripts/download_assets.sh
 
       # Setup Android signing (for release builds)
       - name: Setup Android signing
@@ -137,7 +112,7 @@ jobs:
       - name: Build release APK
         if: github.event_name == 'release'
         run: |
-          flutter build apk --release --target-platform android-arm64
+          flutter build apk --release --split-per-abi
           flutter build appbundle --release
 
       # Upload build artifacts
@@ -173,32 +148,31 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: Flutter Doctor
-        run: flutter doctor -v
-
       - name: Clean
         run: flutter clean
 
       - name: Get dependencies
         run: flutter pub get
 
-      # Create missing directories and assets
-      - name: Create asset directories
+      # Ensure Android v2 embedding is configured to prevent build failures
+      - name: Ensure Android v2 Embedding
         run: |
-          mkdir -p assets/icons
-          mkdir -p assets/fonts/Nunito
-          mkdir -p assets/images/splash
-          mkdir -p assets/images/illustrations
-          mkdir -p assets/images/app_icon
-          mkdir -p assets/animations
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if grep -q 'android:name="flutterEmbedding"' $MANIFEST; then
+            if ! grep -q 'android:value="2"' $MANIFEST; then
+              echo "Updating Android embedding from v1 to v2"
+              sed -i.bak 's/android:value="1"/android:value="2"/g' $MANIFEST
+            fi
+          else
+            echo "Adding Android embedding v2 configuration"
+            sed -i.bak '/<\/application>/i\        <meta-data\n            android:name="flutterEmbedding"\n            android:value="2" \/>' $MANIFEST
+          fi
 
-      # Create placeholder assets
-      - name: Create placeholder assets
+      # Download/Create assets (including placeholders)
+      - name: Setup Assets
         run: |
-          echo "# Placeholder" > assets/fonts/Nunito/Nunito-Regular.ttf
-          echo "# Placeholder" > assets/fonts/Nunito/Nunito-Bold.ttf
-          echo "# Placeholder" > assets/fonts/Nunito/Nunito-Light.ttf
-          echo "# Placeholder" > assets/icons/bottle.png
+          chmod +x scripts/download_assets.sh
+          ./scripts/download_assets.sh
 
       - name: Build web
         run: |

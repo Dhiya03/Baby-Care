@@ -100,6 +100,20 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      # Ensure Android v2 embedding is configured to prevent build failures
+      - name: Ensure Android v2 Embedding
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if grep -q 'android:name="flutterEmbedding"' $MANIFEST; then
+            if ! grep -q 'android:value="2"' $MANIFEST; then
+              echo "Updating Android embedding from v1 to v2"
+              sed -i.bak 's/android:value="1"/android:value="2"/g' $MANIFEST
+            fi
+          else
+            echo "Adding Android embedding v2 configuration"
+            sed -i.bak '/<\/application>/i\        <meta-data\n            android:name="flutterEmbedding"\n            android:value="2" \/>' $MANIFEST
+          fi
+
       - name: Setup Android signing
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/app/keystore.jks
