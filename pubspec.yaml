@@ -1,43 +1,56 @@
 name: baby_care_app
-description: A simple baby care tracking app
+description: A simple baby care tracking app for new parents
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
 
 dependencies:
   flutter:
     sdk: flutter
   
-  # State Management
-  flutter_riverpod: ^3.0.0
+  # State Management - Fixed version to avoid conflicts
+  flutter_riverpod: ^2.4.9
   
-  # Local Storage
-  path_provider: ^2.1.3
+  # Local Storage - Compatible versions
+  path_provider: ^2.1.1
   
-  # Notifications (compatible with Android Embedding V2)
-  flutter_local_notifications: ^19.4.2
+  # Notifications - Fixed to stable version that works with Android Embedding V2
+  flutter_local_notifications: ^15.1.3
   
-  # Permissions
-  permission_handler: ^12.0.1
+  # Permissions - Stable version
+  permission_handler: ^11.0.1
   
-  # Share/Export
-  share_plus: ^12.0.0
+  # Share/Export - Fixed version
+  share_plus: ^7.2.1
   
-  # Date/Time
-  intl: ^0.20.2
+  # Date/Time - Stable version
+  intl: ^0.18.1
   
-  # UI
-  cupertino_icons: ^1.0.2
+  # UI Icons
+  cupertino_icons: ^1.0.6
   
-  # Animations (optional)
-  lottie: ^3.1.2
+  # Optional: Animations
+  # lottie: ^2.7.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^3.0.0
+  
+  # For testing
+  test: ^1.24.0
+  mockito: ^5.4.2
+  build_runner: ^2.4.7
+
+# Override dependency conflicts
+dependency_overrides:
+  # Fix version conflicts if they occur
+  meta: ^1.10.0
+  material_color_utilities: ^0.5.0
+  collection: ^1.17.2
 
 flutter:
   uses-material-design: true
