@@ -24,8 +24,11 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
+          flutter-version: '3.22.2'   # match your local
+          cache: false                # force fresh install (avoid old cached 3.16.0)
+
+      - name: Check Flutter version
+        run: flutter --version
 
       - name: Get dependencies
         run: flutter pub get
