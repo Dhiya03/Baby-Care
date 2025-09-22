@@ -9,7 +9,7 @@ on:
     types: [ published ]
 
 env:
-  FLUTTER_VERSION: '3.16.0'
+  FLUTTER_VERSION: '3.22.2'
   JAVA_VERSION: '17'
 
 jobs:
@@ -25,9 +25,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
+          cache: false
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
           cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+
+      - name: Check Flutter version
+        run: flutter --version
 
       - name: Flutter Doctor
         run: flutter doctor -v
