@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/timezone.dart' as tz;
+
 import '../utils/constants.dart';
 
 class NotificationService {
@@ -10,7 +12,8 @@ class NotificationService {
   static Future<void> initialize() async {
     if (_initialized) return;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -33,7 +36,7 @@ class NotificationService {
   // Handle notification taps
   static void _onNotificationTapped(NotificationResponse response) {
     final payload = response.payload;
-    
+
     if (payload == 'start_feeding') {
       // TODO: Trigger feeding start from notification
       // This would need to communicate with the app state
@@ -58,7 +61,7 @@ class NotificationService {
     bool isUrgent = false,
   }) async {
     if (!_initialized) await initialize();
-    
+
     final androidDetails = AndroidNotificationDetails(
       'feeding_reminders',
       'Feeding Reminders',
@@ -91,10 +94,11 @@ class NotificationService {
       id,
       title,
       body,
-      scheduledTime,
+      tz.TZDateTime.from(scheduledTime, tz.local),
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       payload: 'feeding_reminder',
     );
   }
@@ -103,26 +107,30 @@ class NotificationService {
   static Future<void> scheduleFeedingReminders(DateTime lastFeedingEnd) async {
     // Cancel any existing reminders
     await cancelAllReminders();
-    
-    final reminderTime = lastFeedingEnd.add(const Duration(hours: AppConstants.defaultReminderHours));
-    final urgentTime = lastFeedingEnd.add(const Duration(hours: AppConstants.urgentReminderHours));
-    
+
+    final reminderTime = lastFeedingEnd
+        .add(const Duration(hours: AppConstants.defaultReminderHours));
+    final urgentTime = lastFeedingEnd
+        .add(const Duration(hours: AppConstants.urgentReminderHours));
+
     // Schedule regular reminder
     if (reminderTime.isAfter(DateTime.now())) {
       await scheduleReminder(
         scheduledTime: reminderTime,
         title: '🍼 Feeding Time',
-        body: 'It\'s been ${AppConstants.defaultReminderHours} hours since the last feeding',
+        body:
+            'It\'s been ${AppConstants.defaultReminderHours} hours since the last feeding',
         id: AppConstants.reminderNotificationId,
       );
     }
-    
+
     // Schedule urgent reminder
     if (urgentTime.isAfter(DateTime.now())) {
       await scheduleReminder(
         scheduledTime: urgentTime,
         title: '🍼 Feeding Overdue!',
-        body: 'It\'s been ${AppConstants.urgentReminderHours} hours since the last feeding',
+        body:
+            'It\'s been ${AppConstants.urgentReminderHours} hours since the last feeding',
         id: AppConstants.urgentReminderNotificationId,
         isUrgent: true,
       );
@@ -145,7 +153,7 @@ class NotificationService {
     required String duration,
   }) async {
     if (!_initialized) await initialize();
-    
+
     const androidDetails = AndroidNotificationDetails(
       'feeding_timer',
       'Feeding Timer',
@@ -195,7 +203,7 @@ class NotificationService {
     required String message,
   }) async {
     if (!_initialized) await initialize();
-    
+
     const androidDetails = AndroidNotificationDetails(
       'log_confirmations',
       'Log Confirmations',
@@ -225,7 +233,8 @@ class NotificationService {
   }
 
   // Get pending notifications (for debugging)
-  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+  static Future<List<PendingNotificationRequest>>
+      getPendingNotifications() async {
     return await _notifications.pendingNotificationRequests();
   }
 }

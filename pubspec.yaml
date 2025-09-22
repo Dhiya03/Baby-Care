@@ -39,18 +39,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+
   
   # For testing
   test: ^1.24.0
   mockito: ^5.4.2
   build_runner: ^2.4.7
-
-# Override dependency conflicts
-dependency_overrides:
-  # Fix version conflicts if they occur
-  meta: ^1.10.0
-  material_color_utilities: ^0.5.0
-  collection: ^1.17.2
 
 flutter:
   uses-material-design: true

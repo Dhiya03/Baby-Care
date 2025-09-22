@@ -15,7 +15,7 @@ class EditEntryScreen extends ConsumerStatefulWidget {
 class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
   final _formKey = GlobalKey<FormState>();
   final _notesController = TextEditingController();
-  
+
   late Event _originalEvent;
   late DateTime _originalDate;
   late DateTime _startDateTime;
@@ -25,18 +25,19 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
+
     // Get arguments passed from previous screen
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null) {
       _originalEvent = args['event'] as Event;
       _originalDate = args['originalDate'] as DateTime;
-      
+
       // Initialize form data
       _startDateTime = _originalEvent.start;
       _endDateTime = _originalEvent.end;
-      _notesController.text = _originalEvent.notes == AppConstants.defaultNotes 
-          ? '' 
+      _notesController.text = _originalEvent.notes == AppConstants.defaultNotes
+          ? ''
           : _originalEvent.notes;
     }
   }
@@ -93,9 +94,10 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                           ),
                           Text(
                             'Created: ${DateFormat('MMM d, y HH:mm').format(_originalEvent.start)}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey[600],
+                                    ),
                           ),
                         ],
                       ),
@@ -104,11 +106,11 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                 ),
               ),
               const SizedBox(height: AppConstants.spacing),
-              
+
               // Date and time fields
               _buildDateTimeFields(),
               const SizedBox(height: AppConstants.spacing),
-              
+
               // Notes field
               TextFormField(
                 controller: _notesController,
@@ -121,14 +123,14 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                 validator: (value) => null, // Notes are optional
               ),
               const SizedBox(height: AppConstants.spacing * 2),
-              
+
               // Action buttons
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _saveChanges,
-                      child: _isLoading 
+                      child: _isLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,
@@ -160,7 +162,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
   Widget _buildEventIcon() {
     IconData iconData;
     Color iconColor;
-    
+
     switch (_originalEvent.type) {
       case AppConstants.feedingType:
         iconData = Icons.baby_changing_station;
@@ -196,7 +198,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
             onTap: () => _selectStartDateTime(),
           ),
         ),
-        
+
         // End date/time (only for feeding)
         if (_originalEvent.isFeeding) ...[
           const SizedBox(height: AppConstants.spacing / 2),
@@ -204,7 +206,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
             child: ListTile(
               leading: const Icon(Icons.stop),
               title: const Text('End Time'),
-              subtitle: Text(_endDateTime != null 
+              subtitle: Text(_endDateTime != null
                   ? DateFormat('MMM d, y HH:mm').format(_endDateTime!)
                   : 'Not set'),
               trailing: const Icon(Icons.edit),
@@ -212,7 +214,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
             ),
           ),
         ],
-        
+
         // Duration display (for feeding)
         if (_originalEvent.isFeeding && _endDateTime != null) ...[
           const SizedBox(height: AppConstants.spacing / 2),
@@ -227,9 +229,9 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                   Text(
                     'Duration: ${_calculateDuration()}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
                   ),
                 ],
               ),
@@ -242,12 +244,12 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
 
   String _calculateDuration() {
     if (_endDateTime == null) return '0m';
-    
+
     final duration = _endDateTime!.difference(_startDateTime);
     final minutes = duration.inMinutes;
     final hours = minutes ~/ 60;
     final remainingMinutes = minutes % 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${remainingMinutes}m';
     }
@@ -261,13 +263,13 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    
+
     if (date != null && mounted) {
       final time = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(_startDateTime),
       );
-      
+
       if (time != null) {
         setState(() {
           _startDateTime = DateTime(
@@ -277,7 +279,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
             time.hour,
             time.minute,
           );
-          
+
           // Adjust end time if it's before start time
           if (_endDateTime != null && _endDateTime!.isBefore(_startDateTime)) {
             _endDateTime = _startDateTime.add(const Duration(minutes: 20));
@@ -289,20 +291,20 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
 
   Future<void> _selectEndDateTime() async {
     if (!_originalEvent.isFeeding) return;
-    
+
     final date = await showDatePicker(
       context: context,
       initialDate: _endDateTime ?? _startDateTime,
       firstDate: _startDateTime,
       lastDate: DateTime.now(),
     );
-    
+
     if (date != null && mounted) {
       final time = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(_endDateTime ?? _startDateTime),
       );
-      
+
       if (time != null) {
         final newEndTime = DateTime(
           date.year,
@@ -311,7 +313,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
           time.hour,
           time.minute,
         );
-        
+
         if (newEndTime.isAfter(_startDateTime)) {
           setState(() {
             _endDateTime = newEndTime;
@@ -330,16 +332,16 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
 
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final notes = _notesController.text.trim().isEmpty 
-          ? AppConstants.defaultNotes 
+      final notes = _notesController.text.trim().isEmpty
+          ? AppConstants.defaultNotes
           : _notesController.text.trim();
-          
+
       final durationMinutes = _originalEvent.isFeeding && _endDateTime != null
           ? _endDateTime!.difference(_startDateTime).inMinutes
           : 0;
@@ -351,8 +353,10 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
         notes: notes,
       );
 
-      await ref.read(eventActionsProvider).updateEvent(_originalDate, updatedEvent);
-      
+      await ref
+          .read(eventActionsProvider)
+          .updateEvent(_originalDate, updatedEvent);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -396,14 +400,16 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context); // Close dialog
-              
+
               setState(() {
                 _isLoading = true;
               });
 
               try {
-                await ref.read(eventActionsProvider).deleteEvent(_originalDate, _originalEvent.id);
-                
+                await ref
+                    .read(eventActionsProvider)
+                    .deleteEvent(_originalDate, _originalEvent.id);
+
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

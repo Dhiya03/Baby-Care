@@ -11,9 +11,12 @@ class DayHistory {
   });
 
   // Get events by type
-  List<Event> get feedingEvents => events.where((e) => e.type == AppConstants.feedingType).toList();
-  List<Event> get urinationEvents => events.where((e) => e.type == AppConstants.urinationType).toList();
-  List<Event> get stoolEvents => events.where((e) => e.type == AppConstants.stoolType).toList();
+  List<Event> get feedingEvents =>
+      events.where((e) => e.type == AppConstants.feedingType).toList();
+  List<Event> get urinationEvents =>
+      events.where((e) => e.type == AppConstants.urinationType).toList();
+  List<Event> get stoolEvents =>
+      events.where((e) => e.type == AppConstants.stoolType).toList();
 
   // Get events sorted by time
   List<Event> get sortedEvents {
@@ -55,7 +58,8 @@ class DayHistory {
 
   // Update event
   DayHistory updateEvent(Event updatedEvent) {
-    final newEvents = events.map((e) => e.id == updatedEvent.id ? updatedEvent : e).toList();
+    final newEvents =
+        events.map((e) => e.id == updatedEvent.id ? updatedEvent : e).toList();
     return DayHistory(date: date, events: newEvents);
   }
 
@@ -71,7 +75,7 @@ class DayHistory {
 
     if (eventDate == today) return 'Today';
     if (eventDate == yesterday) return 'Yesterday';
-    
+
     return '${date.day}/${date.month}/${date.year}';
   }
 

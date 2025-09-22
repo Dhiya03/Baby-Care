@@ -84,75 +84,6 @@ else
     fi
 fi
 
-# Update pubspec.yaml dependencies to latest compatible versions
-echo -e "${BLUE}📦 Updating pubspec.yaml dependencies...${NC}"
-cat > pubspec.yaml << 'EOF'
-name: baby_care_app
-description: A simple baby care tracking app
-publish_to: 'none'
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.0.0 <4.0.0'
-
-dependencies:
-  flutter:
-    sdk: flutter
-  
-  # State Management
-  flutter_riverpod: ^2.4.9
-  
-  # Local Storage
-  path_provider: ^2.1.1
-  
-  # Notifications (compatible with Android Embedding V2)
-  flutter_local_notifications: ^16.3.0
-  
-  # Permissions
-  permission_handler: ^11.2.0
-  
-  # Share/Export
-  share_plus: ^7.2.1
-  
-  # Date/Time
-  intl: ^0.18.1
-  
-  # UI
-  cupertino_icons: ^1.0.2
-  
-  # Animations (optional)
-  lottie: ^2.7.0
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
-
-flutter:
-  uses-material-design: true
-  
-  # Assets configuration
-  assets:
-    - assets/icons/
-    - assets/images/
-    - assets/images/splash/
-    - assets/images/illustrations/
-    - assets/images/app_icon/
-    - assets/animations/
-    - assets/fonts/
-  
-  # Custom fonts
-  fonts:
-    - family: Nunito
-      fonts:
-        - asset: assets/fonts/Nunito/Nunito-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Nunito/Nunito-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Nunito/Nunito-Light.ttf
-          weight: 300
-EOF
-
 # Get dependencies
 echo -e "${BLUE}📦 Getting Flutter dependencies...${NC}"
 flutter pub get
@@ -186,7 +117,6 @@ echo -e "${BLUE}==================${NC}"
 echo -e "✅ Cleaned old build artifacts"
 echo -e "✅ Updated Gradle wrapper to 8.3"
 echo -e "✅ Verified Android Embedding V2 configuration"
-echo -e "✅ Updated dependencies to latest compatible versions"
 echo -e "✅ Tested Android build successfully"
 echo ""
 echo -e "${YELLOW}📋 Next Steps:${NC}"

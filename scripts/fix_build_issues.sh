@@ -83,84 +83,8 @@ EOF
 
 echo -e "${GREEN}✅ Created placeholder assets${NC}"
 
-# Step 4: Fix pubspec.yaml with compatible versions
-echo -e "${BLUE}📦 Step 4: Updating pubspec.yaml with compatible versions...${NC}"
-
-cat > pubspec.yaml << 'EOF'
-name: baby_care_app
-description: A simple baby care tracking app for new parents
-publish_to: 'none'
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.10.0'
-
-dependencies:
-  flutter:
-    sdk: flutter
-  
-  # State Management - Fixed version to avoid conflicts
-  flutter_riverpod: ^2.4.9
-  
-  # Local Storage - Compatible versions
-  path_provider: ^2.1.1
-  
-  # Notifications - Fixed to stable version that works with Android Embedding V2
-  flutter_local_notifications: ^15.1.3
-  
-  # Permissions - Stable version
-  permission_handler: ^11.0.1
-  
-  # Share/Export - Fixed version
-  share_plus: ^7.2.1
-  
-  # Date/Time - Stable version
-  intl: ^0.18.1
-  
-  # UI Icons
-  cupertino_icons: ^1.0.6
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
-
-# Override dependency conflicts
-dependency_overrides:
-  meta: ^1.10.0
-  material_color_utilities: ^0.5.0
-  collection: ^1.17.2
-
-flutter:
-  uses-material-design: true
-  
-  # Assets configuration
-  assets:
-    - assets/icons/
-    - assets/images/
-    - assets/images/splash/
-    - assets/images/illustrations/
-    - assets/images/app_icon/
-    - assets/animations/
-    - assets/fonts/
-  
-  # Custom fonts
-  fonts:
-    - family: Nunito
-      fonts:
-        - asset: assets/fonts/Nunito/Nunito-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Nunito/Nunito-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Nunito/Nunito-Light.ttf
-          weight: 300
-EOF
-
-echo -e "${GREEN}✅ Updated pubspec.yaml${NC}"
-
-# Step 5: Update Android configuration for embedding V2
-echo -e "${BLUE}🤖 Step 5: Ensuring Android Embedding V2 configuration...${NC}"
+# Step 4: Update Android configuration for embedding V2
+echo -e "${BLUE}🤖 Step 4: Ensuring Android Embedding V2 configuration...${NC}"
 
 # Ensure AndroidManifest.xml has correct embedding version
 if [ -f "android/app/src/main/AndroidManifest.xml" ]; then
@@ -177,8 +101,8 @@ else
     echo -e "${YELLOW}⚠️ AndroidManifest.xml not found, skipping Android config${NC}"
 fi
 
-# Step 6: Get dependencies
-echo -e "${BLUE}📦 Step 6: Getting Flutter dependencies...${NC}"
+# Step 5: Get dependencies
+echo -e "${BLUE}📦 Step 5: Getting Flutter dependencies...${NC}"
 flutter pub get
 
 if [ $? -eq 0 ]; then
@@ -189,8 +113,8 @@ else
     flutter pub get --offline || true
 fi
 
-# Step 7: Generate missing files if needed
-echo -e "${BLUE}⚙️ Step 7: Generating missing files...${NC}"
+# Step 6: Generate missing files if needed
+echo -e "${BLUE}⚙️ Step 6: Generating missing files...${NC}"
 
 # Ensure lib/generated_plugin_registrant.dart exists
 if [ ! -f "lib/generated_plugin_registrant.dart" ]; then
@@ -199,12 +123,12 @@ fi
 
 echo -e "${GREEN}✅ File generation completed${NC}"
 
-# Step 8: Run flutter doctor to check for issues
-echo -e "${BLUE}🩺 Step 8: Running Flutter doctor...${NC}"
+# Step 7: Run flutter doctor to check for issues
+echo -e "${BLUE}🩺 Step 7: Running Flutter doctor...${NC}"
 flutter doctor -v
 
-# Step 9: Test build to verify fixes
-echo -e "${BLUE}🔨 Step 9: Testing build...${NC}"
+# Step 8: Test build to verify fixes
+echo -e "${BLUE}🔨 Step 8: Testing build...${NC}"
 echo -e "${YELLOW}This will test if the issues are resolved...${NC}"
 
 # Test Flutter analyze first
@@ -230,7 +154,6 @@ echo -e "${BLUE}================================${NC}"
 echo -e "✅ Cleaned build artifacts"
 echo -e "✅ Created missing asset directories"
 echo -e "✅ Added placeholder assets"
-echo -e "✅ Fixed pubspec.yaml with compatible versions"
 echo -e "✅ Configured Android Embedding V2"
 echo -e "✅ Resolved dependencies"
 echo -e "✅ Tested build process"

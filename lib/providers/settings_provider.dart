@@ -35,7 +35,8 @@ class AppSettings {
   }
 
   @override
-  int get hashCode => Object.hash(remindersEnabled, reminderHours, urgentReminderHours);
+  int get hashCode =>
+      Object.hash(remindersEnabled, reminderHours, urgentReminderHours);
 }
 
 // Settings notifier
@@ -71,6 +72,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 }
 
 // Settings provider
-final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
+final settingsProvider =
+    StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
   return SettingsNotifier();
 });

@@ -2,10 +2,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/event.dart';
 import '../models/day_history.dart';
 import '../services/storage_service.dart';
+import '../services/export_service.dart';
 import '../utils/constants.dart';
 
 // Storage service provider
-final storageServiceProvider = Provider<StorageService>((ref) => StorageService());
+final storageServiceProvider =
+    Provider<StorageService>((ref) => StorageService());
+
+// Export service provider
+final exportServiceProvider = Provider<ExportService>((ref) {
+  return ExportService(ref.watch(storageServiceProvider));
+});
 
 // Current selected date provider
 final selectedDateProvider = StateProvider<DateTime>((ref) {
@@ -33,20 +40,21 @@ final eventActionsProvider = Provider<EventActions>((ref) {
 
 class EventActions {
   final Ref ref;
-  
+
   EventActions(this.ref);
-  
+
   StorageService get _storage => ref.read(storageServiceProvider);
-  
+  ExportService get _export => ref.read(exportServiceProvider);
+
   // Add new event
   Future<void> addEvent(Event event) async {
     await _storage.saveEvent(event);
-    
+
     // Refresh day history
     ref.invalidate(dayHistoryProvider);
     ref.invalidate(availableDatesProvider);
   }
-  
+
   // Quick log urine
   Future<void> logUrine({String notes = AppConstants.defaultNotes}) async {
     final now = DateTime.now();
@@ -56,10 +64,10 @@ class EventActions {
       timestamp: now,
       notes: notes,
     );
-    
+
     await addEvent(event);
   }
-  
+
   // Quick log stool
   Future<void> logStool({String notes = AppConstants.defaultNotes}) async {
     final now = DateTime.now();
@@ -69,35 +77,36 @@ class EventActions {
       timestamp: now,
       notes: notes,
     );
-    
+
     await addEvent(event);
   }
-  
+
   // Update existing event
   Future<void> updateEvent(DateTime originalDate, Event updatedEvent) async {
     await _storage.updateEvent(originalDate, updatedEvent);
-    
+
     // Refresh providers
     ref.invalidate(dayHistoryProvider);
     ref.invalidate(availableDatesProvider);
   }
-  
+
   // Delete event
   Future<void> deleteEvent(DateTime date, String eventId) async {
     await _storage.deleteEvent(date, eventId);
-    
+
     // Refresh day history
     ref.invalidate(dayHistoryProvider);
     ref.invalidate(availableDatesProvider);
   }
-  
+
   // Change selected date
   void selectDate(DateTime date) {
-    ref.read(selectedDateProvider.notifier).state = DateTime(date.year, date.month, date.day);
+    ref.read(selectedDateProvider.notifier).state =
+        DateTime(date.year, date.month, date.day);
   }
-  
-  // Get export file path
-  Future<String?> getExportFilePath(DateTime date) async {
-    return await _storage.getFilePathForDate(date);
+
+  // Export day's history
+  Future<bool> exportDay(DateTime date) async {
+    return await _export.exportDay(date);
   }
 }

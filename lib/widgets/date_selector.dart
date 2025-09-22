@@ -35,11 +35,11 @@ class DateSelector extends StatelessWidget {
                 icon: const Icon(Icons.chevron_left),
                 tooltip: 'Previous day',
               ),
-              
+
               // Current date display (tappable)
               Expanded(
                 child: GestureDetector(
-                  onTap: _showDatePicker,
+                  onTap: () => _showDatePicker(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       vertical: AppConstants.spacing / 2,
@@ -54,17 +54,21 @@ class DateSelector extends StatelessWidget {
                       children: [
                         Text(
                           DateHelper.getRelativeDateString(selectedDate),
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor,
+                              ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           DateFormat('EEEE, MMM d, y').format(selectedDate),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -72,10 +76,12 @@ class DateSelector extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Next date button
               IconButton(
-                onPressed: DateHelper.isToday(selectedDate) ? null : () => _changeDate(1),
+                onPressed: DateHelper.isToday(selectedDate)
+                    ? null
+                    : () => _changeDate(1),
                 icon: const Icon(Icons.chevron_right),
                 tooltip: 'Next day',
               ),
@@ -88,16 +94,14 @@ class DateSelector extends StatelessWidget {
 
   void _changeDate(int days) {
     final newDate = selectedDate.add(Duration(days: days));
-    
+
     // Don't allow future dates
     if (newDate.isAfter(DateTime.now())) return;
-    
+
     onDateChanged(newDate);
   }
 
-  void _showDatePicker() async {
-    final context = this.context;
-    
+  void _showDatePicker(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -107,9 +111,9 @@ class DateSelector extends StatelessWidget {
       selectableDayPredicate: (DateTime date) {
         // If available dates are provided, only allow those dates
         if (availableDates != null) {
-          return availableDates!.any((availableDate) => 
-            DateHelper.getDateOnly(availableDate) == DateHelper.getDateOnly(date)
-          );
+          return availableDates!.any((availableDate) =>
+              DateHelper.getDateOnly(availableDate) ==
+              DateHelper.getDateOnly(date));
         }
         return true;
       },
@@ -117,14 +121,14 @@ class DateSelector extends StatelessWidget {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: Theme.of(context).primaryColor,
-            ),
+                  primary: Theme.of(context).primaryColor,
+                ),
           ),
           child: child!,
         );
       },
     );
-    
+
     if (picked != null && picked != selectedDate) {
       onDateChanged(picked);
     }
@@ -148,30 +152,33 @@ class CompactDateSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 60,
-      child: showWeekSelector ? _buildWeekSelector() : _buildDaySelector(),
+      child: showWeekSelector
+          ? _buildWeekSelector(context)
+          : _buildDaySelector(context),
     );
   }
 
-  Widget _buildDaySelector() {
+  Widget _buildDaySelector(BuildContext context) {
     final dates = _getWeekDates();
-    
+
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: dates.length,
       itemBuilder: (context, index) {
         final date = dates[index];
-        final isSelected = DateHelper.getDateOnly(date) == DateHelper.getDateOnly(selectedDate);
+        final isSelected = DateHelper.getDateOnly(date) ==
+            DateHelper.getDateOnly(selectedDate);
         final isToday = DateHelper.isToday(date);
-        
+
         return GestureDetector(
           onTap: () => onDateChanged(date),
           child: Container(
             width: 60,
             margin: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
-              color: isSelected 
-                  ? Theme.of(context).primaryColor 
-                  : isToday 
+              color: isSelected
+                  ? Theme.of(context).primaryColor
+                  : isToday
                       ? Theme.of(context).primaryColor.withOpacity(0.1)
                       : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
@@ -185,21 +192,22 @@ class CompactDateSelector extends StatelessWidget {
                 Text(
                   DateFormat('E').format(date),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isSelected 
-                        ? Colors.white 
-                        : Theme.of(context).textTheme.bodySmall?.color,
-                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                  ),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context).textTheme.bodySmall?.color,
+                        fontWeight:
+                            isToday ? FontWeight.bold : FontWeight.normal,
+                      ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${date.day}',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: isSelected 
-                        ? Colors.white 
-                        : Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -209,7 +217,7 @@ class CompactDateSelector extends StatelessWidget {
     );
   }
 
-  Widget _buildWeekSelector() {
+  Widget _buildWeekSelector(BuildContext context) {
     return Row(
       children: [
         IconButton(
@@ -239,7 +247,7 @@ class CompactDateSelector extends StatelessWidget {
   String _getWeekString() {
     final startOfWeek = DateHelper.getStartOfWeek(selectedDate);
     final endOfWeek = DateHelper.getEndOfWeek(selectedDate);
-    
+
     if (startOfWeek.month == endOfWeek.month) {
       return '${DateFormat('MMM d').format(startOfWeek)} - ${DateFormat('d, y').format(endOfWeek)}';
     } else {
@@ -249,10 +257,10 @@ class CompactDateSelector extends StatelessWidget {
 
   void _changeWeek(int weeks) {
     final newDate = selectedDate.add(Duration(days: weeks * 7));
-    
+
     // Don't allow future dates
     if (newDate.isAfter(DateTime.now())) return;
-    
+
     onDateChanged(newDate);
   }
 }

@@ -1,3 +1,9 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -27,10 +33,6 @@ def keyPropertiesFile = rootProject.file('key.properties')
 if (keyPropertiesFile.exists()) {
     keyProperties.load(new FileInputStream(keyPropertiesFile))
 }
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.babycareapp.baby_care_app"
@@ -66,12 +68,6 @@ android {
             storeFile keyProperties['storeFile'] ? file(keyProperties['storeFile']) : null
             storePassword keyProperties['storePassword']
         }
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
     }
 
     buildTypes {
@@ -85,7 +81,6 @@ android {
             manifestPlaceholders = [appName: "BabyCare"]
         }
         debug {
-            signingConfig signingConfigs.debug
             debuggable true
             minifyEnabled false
             
@@ -93,7 +88,6 @@ android {
             manifestPlaceholders = [appName: "BabyCare Debug"]
         }
         profile {
-            signingConfig signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -111,17 +105,17 @@ android {
 
     // Output file naming
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def versionName = variant.versionName
-            def versionCode = variant.versionCode
-            def buildType = variant.buildType.name
-            def abi = output.getFilter(com.android.build.OutputFile.ABI)
-            
-            if (abi != null) {
-                output.outputFileName = "baby-care-${versionName}-${versionCode}-${buildType}-${abi}.apk"
+        variant.outputs.all { output ->
+            def newApkName
+            def abiFilter = output.filters.find { it.filterType == 'ABI' }?.identifier
+
+            if (abiFilter) {
+                newApkName = "baby-care-${variant.versionName}-${variant.versionCode}-${variant.buildType.name}-${abiFilter}.apk"
             } else {
-                output.outputFileName = "baby-care-${versionName}-${versionCode}-${buildType}-universal.apk"
+                // This branch is for the universal APK
+                newApkName = "baby-care-${variant.versionName}-${variant.versionCode}-${variant.buildType.name}-universal.apk"
             }
+            output.outputFileName = newApkName
         }
     }
 }

@@ -9,7 +9,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -24,11 +24,14 @@ class SettingsScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.notifications),
                   title: const Text('Feeding Reminders'),
-                  subtitle: const Text('Get notified when it\'s time to feed baby'),
+                  subtitle:
+                      const Text('Get notified when it\'s time to feed baby'),
                   trailing: Switch(
                     value: settings.remindersEnabled,
                     onChanged: (value) {
-                      ref.read(settingsProvider.notifier).toggleReminders(value);
+                      ref
+                          .read(settingsProvider.notifier)
+                          .toggleReminders(value);
                     },
                   ),
                 ),
@@ -37,7 +40,8 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.schedule),
                     title: const Text('Reminder Interval'),
-                    subtitle: Text('${settings.reminderHours} hours after feeding'),
+                    subtitle:
+                        Text('${settings.reminderHours} hours after feeding'),
                     trailing: DropdownButton<int>(
                       value: settings.reminderHours,
                       items: const [
@@ -48,7 +52,9 @@ class SettingsScreen extends ConsumerWidget {
                       ],
                       onChanged: (value) {
                         if (value != null) {
-                          ref.read(settingsProvider.notifier).setReminderHours(value);
+                          ref
+                              .read(settingsProvider.notifier)
+                              .setReminderHours(value);
                         }
                       },
                     ),
@@ -57,7 +63,8 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.notifications_active),
                     title: const Text('Urgent Reminder'),
-                    subtitle: Text('${settings.urgentReminderHours} hours (stronger notification)'),
+                    subtitle: Text(
+                        '${settings.urgentReminderHours} hours (stronger notification)'),
                     trailing: DropdownButton<int>(
                       value: settings.urgentReminderHours,
                       items: const [
@@ -68,7 +75,9 @@ class SettingsScreen extends ConsumerWidget {
                       ],
                       onChanged: (value) {
                         if (value != null) {
-                          ref.read(settingsProvider.notifier).setUrgentReminderHours(value);
+                          ref
+                              .read(settingsProvider.notifier)
+                              .setUrgentReminderHours(value);
                         }
                       },
                     ),
@@ -78,7 +87,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppConstants.spacing),
-          
+
           // Data management section
           Card(
             child: Column(
@@ -107,7 +116,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppConstants.spacing),
-          
+
           // App info section
           Card(
             child: Column(
@@ -134,7 +143,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppConstants.spacing),
-          
+
           // Debug section (only in development)
           if (const bool.fromEnvironment('DEBUG', defaultValue: false))
             Card(
@@ -147,9 +156,12 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.delete_forever, color: Colors.red),
-                    title: const Text('Clear All Data', style: TextStyle(color: Colors.red)),
-                    subtitle: const Text('Delete all baby history (cannot be undone)'),
+                    leading:
+                        const Icon(Icons.delete_forever, color: Colors.red),
+                    title: const Text('Clear All Data',
+                        style: TextStyle(color: Colors.red)),
+                    subtitle: const Text(
+                        'Delete all baby history (cannot be undone)'),
                     onTap: () => _clearAllData(context, ref),
                   ),
                 ],
@@ -246,7 +258,8 @@ class SettingsScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('How to use BabyCare:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('How to use BabyCare:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
               Text('🍼 Feeding: Tap to start timer, tap again to stop'),
               Text('💧 Urination: One tap to log instantly'),
@@ -283,21 +296,24 @@ class SettingsScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Your Privacy Matters', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('Your Privacy Matters',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
               Text('• All data is stored locally on your device'),
               Text('• No data is sent to external servers'),
               Text('• No account registration required'),
               Text('• You control all data sharing'),
               SizedBox(height: 16),
-              Text('What We Store:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('What We Store:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
               Text('• Baby feeding times and durations'),
               Text('• Urination and stool timestamps'),
               Text('• Notes you add to events'),
               Text('• App settings and preferences'),
               SizedBox(height: 16),
-              Text('Data Sharing:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('Data Sharing:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
               Text('• Only when you explicitly export/share files'),
               Text('• You choose what to share and with whom'),
@@ -334,7 +350,8 @@ class SettingsScreen extends ConsumerWidget {
               Navigator.pop(context);
               _confirmClearAllData(context, ref);
             },
-            child: const Text('Continue', style: TextStyle(color: Colors.orange)),
+            child:
+                const Text('Continue', style: TextStyle(color: Colors.orange)),
           ),
         ],
       ),
@@ -374,7 +391,8 @@ class SettingsScreen extends ConsumerWidget {
                 );
               }
             },
-            child: const Text('DELETE ALL', style: TextStyle(color: Colors.red)),
+            child:
+                const Text('DELETE ALL', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

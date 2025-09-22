@@ -11,6 +11,9 @@ on:
         required: true
         default: 'v1.0.0'
 
+permissions:
+  contents: write # Allow softprops/action-gh-release to create a release and upload assets
+
 env:
   FLUTTER_VERSION: '3.22.2'
   JAVA_VERSION: '17'

@@ -52,7 +52,7 @@ class FeedingTimerNotifier extends StateNotifier<FeedingTimerState> {
 
     final now = DateTime.now();
     final feedingId = 'feeding_${now.millisecondsSinceEpoch}';
-    
+
     state = state.copyWith(
       isFeeding: true,
       startTime: now,
@@ -66,7 +66,9 @@ class FeedingTimerNotifier extends StateNotifier<FeedingTimerState> {
 
   // Stop feeding
   Future<void> stopFeeding({String notes = AppConstants.defaultNotes}) async {
-    if (!state.isFeeding || state.startTime == null || state.currentFeedingId == null) {
+    if (!state.isFeeding ||
+        state.startTime == null ||
+        state.currentFeedingId == null) {
       return;
     }
 
@@ -89,9 +91,15 @@ class FeedingTimerNotifier extends StateNotifier<FeedingTimerState> {
 
     // Reset state
     state = const FeedingTimerState();
-    
+
     // Schedule reminder (will be implemented in notification service)
     _scheduleReminder(endTime);
+  }
+
+  // Reset timer state
+  void reset() {
+    _stopTimer();
+    state = const FeedingTimerState();
   }
 
   void _startTimer() {
@@ -122,6 +130,7 @@ class FeedingTimerNotifier extends StateNotifier<FeedingTimerState> {
 }
 
 // Provider
-final feedingTimerProvider = StateNotifierProvider<FeedingTimerNotifier, FeedingTimerState>((ref) {
+final feedingTimerProvider =
+    StateNotifierProvider<FeedingTimerNotifier, FeedingTimerState>((ref) {
   return FeedingTimerNotifier(ref);
 });

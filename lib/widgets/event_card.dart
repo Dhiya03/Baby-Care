@@ -29,7 +29,7 @@ class EventCard extends StatelessWidget {
               // Event type icon
               _buildEventIcon(context),
               const SizedBox(width: AppConstants.spacing),
-              
+
               // Event details
               Expanded(
                 child: Column(
@@ -39,20 +39,21 @@ class EventCard extends StatelessWidget {
                       children: [
                         Text(
                           event.type,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const Spacer(),
                         Text(
                           _formatTime(event.start),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                       ],
                     ),
-                    
                     if (event.isFeeding) ...[
                       const SizedBox(height: 4),
                       Row(
@@ -60,9 +61,12 @@ class EventCard extends StatelessWidget {
                           if (event.end != null)
                             Text(
                               'End: ${_formatTime(event.end!)}',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                             ),
                           const Spacer(),
                           if (event.displayDuration.isNotEmpty)
@@ -72,29 +76,34 @@ class EventCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                color: Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 event.displayDuration,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).primaryColor,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
                               ),
                             ),
                         ],
                       ),
                     ],
-                    
-                    if (event.notes != AppConstants.defaultNotes && event.notes.isNotEmpty) ...[
+                    if (event.notes != AppConstants.defaultNotes &&
+                        event.notes.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         event.notes,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: Colors.grey[700],
-                        ),
+                              fontStyle: FontStyle.italic,
+                              color: Colors.grey[700],
+                            ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -102,7 +111,7 @@ class EventCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Actions
               if (onDelete != null)
                 PopupMenuButton<String>(
@@ -147,7 +156,7 @@ class EventCard extends StatelessWidget {
   Widget _buildEventIcon(BuildContext context) {
     IconData iconData;
     Color iconColor;
-    
+
     switch (event.type) {
       case AppConstants.feedingType:
         iconData = Icons.baby_changing_station;

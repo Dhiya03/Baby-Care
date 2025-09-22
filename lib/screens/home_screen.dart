@@ -12,7 +12,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final feedingTimerState = ref.watch(feedingTimerProvider);
     final eventActions = ref.watch(eventActionsProvider);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('BabyCare 🍼💖'),
@@ -31,22 +31,25 @@ class HomeScreen extends ConsumerWidget {
             // Status display
             _buildStatusCard(context, feedingTimerState),
             const SizedBox(height: AppConstants.spacing * 2),
-            
+
             // Main action buttons
             FeedingButton(
               isFeeding: feedingTimerState.isFeeding,
-              duration: feedingTimerState.isFeeding ? feedingTimerState.formattedDuration : null,
-              onPressed: () => _handleFeedingButton(context, ref, feedingTimerState),
+              duration: feedingTimerState.isFeeding
+                  ? feedingTimerState.formattedDuration
+                  : null,
+              onPressed: () =>
+                  _handleFeedingButton(context, ref, feedingTimerState),
             ),
             const SizedBox(height: AppConstants.spacing),
-            
+
             ActionButton(
               text: 'Urination',
               icon: Icons.water_drop,
               onPressed: () => _handleUrinationButton(context, eventActions),
             ),
             const SizedBox(height: AppConstants.spacing),
-            
+
             ActionButton(
               text: 'Stool',
               icon: Icons.circle,
@@ -54,7 +57,7 @@ class HomeScreen extends ConsumerWidget {
               onPressed: () => _handleStoolButton(context, eventActions),
             ),
             const SizedBox(height: AppConstants.spacing * 2),
-            
+
             // Navigation buttons
             Row(
               children: [
@@ -143,22 +146,24 @@ class HomeScreen extends ConsumerWidget {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  void _handleFeedingButton(BuildContext context, WidgetRef ref, FeedingTimerState timerState) {
+  void _handleFeedingButton(
+      BuildContext context, WidgetRef ref, FeedingTimerState timerState) {
     final timerNotifier = ref.read(feedingTimerProvider.notifier);
-    
+
     if (timerState.isFeeding) {
       // Show stop feeding dialog
       _showStopFeedingDialog(context, timerNotifier);
     } else {
       // Start feeding
       timerNotifier.startFeeding();
-      
+
       // Navigate to timer screen
       Navigator.pushNamed(context, '/feeding-timer');
     }
   }
 
-  void _showStopFeedingDialog(BuildContext context, FeedingTimerNotifier timerNotifier) {
+  void _showStopFeedingDialog(
+      BuildContext context, FeedingTimerNotifier timerNotifier) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -182,7 +187,8 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  void _handleUrinationButton(BuildContext context, EventActions eventActions) async {
+  void _handleUrinationButton(
+      BuildContext context, EventActions eventActions) async {
     try {
       await eventActions.logUrine();
       _showSuccessSnackBar(context, 'Urination logged!');
@@ -191,7 +197,8 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
-  void _handleStoolButton(BuildContext context, EventActions eventActions) async {
+  void _handleStoolButton(
+      BuildContext context, EventActions eventActions) async {
     try {
       await eventActions.logStool();
       _showSuccessSnackBar(context, 'Stool logged!');

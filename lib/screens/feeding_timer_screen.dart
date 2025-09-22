@@ -57,14 +57,14 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                       color: Theme.of(context).primaryColor,
                     ),
                     const SizedBox(height: AppConstants.spacing),
-                    
+
                     Text(
                       'Feeding in Progress',
                       style: Theme.of(context).textTheme.headlineMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppConstants.spacing),
-                    
+
                     // Duration display
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -77,27 +77,28 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                       ),
                       child: Text(
                         timerState.formattedDuration,
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 48,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 48,
+                                ),
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacing),
-                    
+
                     if (timerState.startTime != null)
                       Text(
                         'Started at ${_formatTime(timerState.startTime!)}',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                              color: Colors.grey[600],
+                            ),
                       ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: AppConstants.spacing * 2),
-            
+
             // Notes input
             TextField(
               controller: _notesController,
@@ -109,7 +110,7 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
               maxLines: 3,
             ),
             const SizedBox(height: AppConstants.spacing * 2),
-            
+
             // Stop feeding button
             SizedBox(
               width: double.infinity,
@@ -119,7 +120,8 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.secondary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.buttonRadius),
                   ),
                 ),
                 child: Row(
@@ -129,17 +131,20 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                     const SizedBox(width: AppConstants.spacing),
                     Text(
                       'End Feeding',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSecondary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(
+                            color: Theme.of(context).colorScheme.onSecondary,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: AppConstants.spacing),
-            
+
             // Cancel button
             TextButton(
               onPressed: () => _showCancelDialog(),
@@ -156,13 +161,13 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
   }
 
   void _stopFeeding(FeedingTimerNotifier timerNotifier) async {
-    final notes = _notesController.text.trim().isEmpty 
-        ? AppConstants.defaultNotes 
+    final notes = _notesController.text.trim().isEmpty
+        ? AppConstants.defaultNotes
         : _notesController.text.trim();
-    
+
     try {
       await timerNotifier.stopFeeding(notes: notes);
-      
+
       if (mounted) {
         // Show success and navigate back
         ScaffoldMessenger.of(context).showSnackBar(
@@ -202,7 +207,7 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
-              ref.read(feedingTimerProvider.notifier).state = const FeedingTimerState();
+              ref.read(feedingTimerProvider.notifier).reset();
               Navigator.pop(context); // Go back to home
             },
             child: const Text('Yes, Cancel'),

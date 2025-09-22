@@ -11,12 +11,13 @@ class FileHelper {
   // Get baby history directory
   static Future<Directory> getBabyHistoryDirectory() async {
     final docs = await getDocumentsDirectory();
-    final historyDir = Directory('${docs.path}/${AppConstants.historyFolderName}');
-    
+    final historyDir =
+        Directory('${docs.path}/${AppConstants.historyFolderName}');
+
     if (!await historyDir.exists()) {
       await historyDir.create(recursive: true);
     }
-    
+
     return historyDir;
   }
 
@@ -60,9 +61,11 @@ class FileHelper {
     try {
       final historyDir = await getBabyHistoryDirectory();
       final entities = await historyDir.list().toList();
-      
+
       return entities
-          .where((entity) => entity is File && entity.path.endsWith(AppConstants.fileExtension))
+          .where((entity) =>
+              entity is File &&
+              entity.path.endsWith(AppConstants.fileExtension))
           .cast<File>()
           .toList();
     } catch (e) {
@@ -75,11 +78,11 @@ class FileHelper {
     try {
       final files = await getAllHistoryFiles();
       int totalSize = 0;
-      
+
       for (final file in files) {
         totalSize += await file.length();
       }
-      
+
       return totalSize;
     } catch (e) {
       return 0;
@@ -90,7 +93,8 @@ class FileHelper {
   static String formatFileSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024 * 1024 * 1024)
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
@@ -115,21 +119,21 @@ class FileHelper {
     try {
       final historyDir = await getBabyHistoryDirectory();
       final entities = await historyDir.list().toList();
-      
+
       final backupFiles = entities
           .where((entity) => entity is File && entity.path.contains('_backup_'))
           .cast<File>()
           .toList();
-      
+
       if (backupFiles.length <= keepCount) return;
-      
+
       // Sort by modification time (oldest first)
       backupFiles.sort((a, b) {
         final aStat = a.statSync();
         final bStat = b.statSync();
         return aStat.modified.compareTo(bStat.modified);
       });
-      
+
       // Delete oldest files
       final filesToDelete = backupFiles.take(backupFiles.length - keepCount);
       for (final file in filesToDelete) {
@@ -158,14 +162,14 @@ class FileHelper {
     try {
       final file = File(filePath);
       if (!await file.exists()) return;
-      
+
       final fileName = file.uri.pathSegments.last;
       final backupName = createBackupFileName(fileName);
       final historyDir = await getBabyHistoryDirectory();
       final backupPath = '${historyDir.path}/$backupName';
-      
+
       await file.copy(backupPath);
-      
+
       // Clean up old backups
       await cleanupOldBackups();
     } catch (e) {
@@ -174,20 +178,21 @@ class FileHelper {
   }
 
   // Atomic file write (write to temp file, then rename)
-  static Future<void> writeFileAtomically(String filePath, String content) async {
+  static Future<void> writeFileAtomically(
+      String filePath, String content) async {
     final tempPath = '$filePath.tmp';
     final tempFile = File(tempPath);
     final targetFile = File(filePath);
-    
+
     try {
       // Write to temp file
       await tempFile.writeAsString(content);
-      
+
       // Create backup of existing file if it exists
       if (await targetFile.exists()) {
         await createBackup(filePath);
       }
-      
+
       // Atomic rename
       await tempFile.rename(filePath);
     } catch (e) {

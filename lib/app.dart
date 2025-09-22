@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'screens/edit_entry_screen.dart';
 import 'screens/feeding_timer_screen.dart';
 import 'screens/history_screen.dart';
-import 'screens/edit_entry_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 import 'theme/app_theme.dart';
 

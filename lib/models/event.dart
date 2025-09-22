@@ -66,14 +66,16 @@ class Event {
     if (parts.length < 4) {
       throw FormatException('Invalid event line format: $line');
     }
-    
+
     return Event(
       id: id,
       type: parts[0],
       start: DateTime.parse(parts[1]),
       end: parts[2].isEmpty ? null : DateTime.parse(parts[2]),
       durationMinutes: int.tryParse(parts[3]) ?? 0,
-      notes: parts.length > 4 ? parts.sublist(4).join(',') : AppConstants.defaultNotes,
+      notes: parts.length > 4
+          ? parts.sublist(4).join(',')
+          : AppConstants.defaultNotes,
     );
   }
 
@@ -98,10 +100,11 @@ class Event {
 
   // Check if event is feeding
   bool get isFeeding => type == AppConstants.feedingType;
-  
+
   // Check if event is instant (urine/stool)
-  bool get isInstant => type == AppConstants.urinationType || type == AppConstants.stoolType;
-  
+  bool get isInstant =>
+      type == AppConstants.urinationType || type == AppConstants.stoolType;
+
   // Get display duration
   String get displayDuration {
     if (durationMinutes == 0) return '';

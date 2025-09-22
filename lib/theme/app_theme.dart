@@ -15,7 +15,6 @@ class AppTheme {
       primaryColor: primaryPink,
       scaffoldBackgroundColor: white,
       fontFamily: 'Nunito',
-      
       appBarTheme: const AppBarTheme(
         backgroundColor: primaryPink,
         foregroundColor: darkGrey,
@@ -28,7 +27,6 @@ class AppTheme {
           color: darkGrey,
         ),
       ),
-      
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryPink,
@@ -44,15 +42,13 @@ class AppTheme {
           ),
         ),
       ),
-      
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: lightPink,
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
-      
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
           fontFamily: 'Nunito',
@@ -77,16 +73,13 @@ class AppTheme {
           color: darkGrey,
         ),
       ),
-      
       colorScheme: const ColorScheme.light(
         primary: primaryPink,
-        secondary: accentPink,
-        surface: white,
-        background: lightPink,
         onPrimary: darkGrey,
+        secondary: accentPink,
         onSecondary: darkGrey,
+        surface: lightPink,
         onSurface: darkGrey,
-        onBackground: darkGrey,
       ),
     );
   }

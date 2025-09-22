@@ -37,13 +37,13 @@ class DateHelper {
 
     if (dateOnly == today) return 'Today';
     if (dateOnly == yesterday) return 'Yesterday';
-    
+
     // If within the last week, show day name
     final daysDifference = today.difference(dateOnly).inDays;
     if (daysDifference > 0 && daysDifference < 7) {
       return _dayNameFormat.format(date);
     }
-    
+
     return formatDate(date);
   }
 
@@ -63,7 +63,8 @@ class DateHelper {
   // Check if date is yesterday
   static bool isYesterday(DateTime date) {
     final now = DateTime.now();
-    final yesterday = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1));
+    final yesterday = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 1));
     final dateOnly = DateTime(date.year, date.month, date.day);
     return dateOnly == yesterday;
   }
@@ -94,10 +95,10 @@ class DateHelper {
   static String formatDuration(int minutes) {
     if (minutes == 0) return '0m';
     if (minutes < 60) return '${minutes}m';
-    
+
     final hours = minutes ~/ 60;
     final remainingMinutes = minutes % 60;
-    
+
     if (remainingMinutes == 0) return '${hours}h';
     return '${hours}h ${remainingMinutes}m';
   }
@@ -123,7 +124,7 @@ class DateHelper {
   static String getTimeAgo(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inMinutes < 1) {
       return 'Just now';
     } else if (difference.inMinutes < 60) {
@@ -160,12 +161,12 @@ class DateHelper {
     final dates = <DateTime>[];
     DateTime current = getDateOnly(start);
     final endDate = getDateOnly(end);
-    
+
     while (!current.isAfter(endDate)) {
       dates.add(current);
       current = current.add(const Duration(days: 1));
     }
-    
+
     return dates;
   }
 }
