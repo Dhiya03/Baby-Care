@@ -9,7 +9,7 @@ on:
     types: [ published ]
 
 env:
-  FLUTTER_VERSION: '3.16.0'
+  FLUTTER_VERSION: '3.22.2'
   JAVA_VERSION: '17'
 
 jobs:
@@ -29,6 +29,11 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Download assets
+        run: |
+          chmod +x scripts/download_assets.sh
+          ./scripts/download_assets.sh
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed lib/
@@ -67,6 +72,11 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Download assets
+        run: |
+          chmod +x scripts/download_assets.sh
+          ./scripts/download_assets.sh
 
       # Setup Android signing (for release builds)
       - name: Setup Android signing
@@ -137,6 +147,11 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Download assets
+        run: |
+          chmod +x scripts/download_assets.sh
+          ./scripts/download_assets.sh
+
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -175,9 +190,16 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+          cache-key: baby-care-${{ github.run_id }}
+
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Download assets
+        run: |
+          chmod +x scripts/download_assets.sh
+          ./scripts/download_assets.sh
 
       - name: Build web
         run: flutter build web --release --base-href "/baby-care-app/"

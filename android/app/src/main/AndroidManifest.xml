@@ -1,89 +1,45 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <!-- Required permissions for baby care app -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    
-    <!-- Notification permissions (Android 13+) -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    
-    <!-- Foreground service for feeding timer -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    
-    <!-- Schedule exact alarms for feeding reminders -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-    
-    <!-- Battery optimization exclusion -->
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    
-    <!-- Quick Settings Tile -->
-    <uses-permission android:name="android.permission.BIND_QUICK_SETTINGS_TILE" />
+
+    <!-- Required permissions -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
 
     <application
         android:label="${appName}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:allowBackup="true"
-        android:requestLegacyExternalStorage="true">
-        
-        <!-- Main Activity -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:taskAffinity=""
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
-            <!-- Specifies an Android theme to apply to this Activity as soon as
-                 the Android process has started. This theme is visible to the user
-                 while the Flutter UI initializes. After that, this theme continues
-                 to determine the Window background behind the Flutter UI. -->
-            <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme" />
-            
-            <!-- Standard intent filters -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-            
-            <!-- Handle notification actions -->
-            <intent-filter>
-                <action android:name="com.babycareapp.START_FEEDING" />
-                <action android:name="com.babycareapp.STOP_FEEDING" />
-                <action android:name="com.babycareapp.LOG_URINE" />
-                <action android:name="com.babycareapp.LOG_STOOL" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        android:allowBackup="true">
 
-        <!-- Feeding Timer Service -->
+        <!-- Main Activity (Flutter V2 Embedding) -->
+<activity
+    android:name=".MainActivity"
+    android:exported="true"
+    android:launchMode="singleTop"
+    android:theme="@style/LaunchTheme"
+    android:configChanges="orientation|keyboardHidden|screenSize|locale|layoutDirection|fontScale|density|uiMode"
+    android:windowSoftInputMode="adjustResize">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+    </intent-filter>
+</activity>
+
+
+        <!-- Feeding Timer Foreground Service -->
         <service
             android:name=".services.FeedingTimerService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Baby feeding timer" />
-        </service>
+            android:foregroundServiceType="dataSync|connectedDevice" />
 
-        <!-- Quick Settings Tile Service -->
+        <!-- Quick Settings Tile -->
         <service
             android:name=".services.BabyCareQuickTileService"
-            android:exported="true"
-            android:icon="@drawable/ic_baby_tile"
-            android:label="Baby Care"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
@@ -93,60 +49,28 @@
         <receiver
             android:name=".receivers.NotificationActionReceiver"
             android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.babycareapp.NOTIFICATION_ACTION" />
-            </intent-filter>
-        </receiver>
+            android:exported="false" />
 
-        <!-- Boot Receiver (to reschedule notifications) -->
+        <!-- Boot Receiver -->
         <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true"
             android:exported="false">
-            <intent-filter android:priority="1000">
+            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <data android:scheme="package" />
             </intent-filter>
         </receiver>
 
-        <!-- File Provider for sharing files -->
+        <!-- File Provider (for history export) -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.babycareapp.baby_care_app.fileprovider"
+            android:authorities="com.babycareapp.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <!-- Notification Channels -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_notification" />
-        
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/notification_color" />
-
-        <!-- Network security config -->
-        <meta-data
-            android:name="android.net.http.NetworkSecurityConfig"
-            android:resource="@xml/network_security_config" />
     </application>
-
-    <!-- Query for other apps (Android 11+) -->
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.SEND" />
-            <data android:mimeType="text/plain" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.SEND" />
-            <data android:mimeType="application/octet-stream" />
-        </intent>
-    </queries>
 </manifest>
