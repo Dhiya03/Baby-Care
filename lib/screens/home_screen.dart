@@ -147,7 +147,10 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _handleFeedingButton(
-      BuildContext context, WidgetRef ref, FeedingTimerState timerState) {
+    BuildContext context,
+    WidgetRef ref,
+    FeedingTimerState timerState,
+  ) {
     final timerNotifier = ref.read(feedingTimerProvider.notifier);
 
     if (timerState.isFeeding) {
@@ -163,7 +166,9 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _showStopFeedingDialog(
-      BuildContext context, FeedingTimerNotifier timerNotifier) {
+    BuildContext context,
+    FeedingTimerNotifier timerNotifier,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -188,7 +193,9 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _handleUrinationButton(
-      BuildContext context, EventActions eventActions) async {
+    BuildContext context,
+    EventActions eventActions,
+  ) async {
     try {
       await eventActions.logUrine();
       _showSuccessSnackBar(context, 'Urination logged!');
@@ -198,7 +205,9 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _handleStoolButton(
-      BuildContext context, EventActions eventActions) async {
+    BuildContext context,
+    EventActions eventActions,
+  ) async {
     try {
       await eventActions.logStool();
       _showSuccessSnackBar(context, 'Stool logged!');

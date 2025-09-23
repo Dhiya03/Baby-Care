@@ -23,8 +23,9 @@ class StorageServiceWeb implements StorageService {
     final prefs = await _getPrefs();
     final key = _getKeyForDate(event.start);
     final existingContent = prefs.getString(key) ?? '';
-    final newContent =
-        existingContent.isEmpty ? _createFileHeader(event.start) : existingContent;
+    final newContent = existingContent.isEmpty
+        ? _createFileHeader(event.start)
+        : existingContent;
 
     final line = '${event.toFileLine()}\n';
     await prefs.setString(key, newContent + line);
@@ -49,7 +50,9 @@ class StorageServiceWeb implements StorageService {
     for (int i = 0; i < lines.length; i++) {
       try {
         final event = Event.fromFileLine(
-            lines[i], 'event_${date.millisecondsSinceEpoch}_$i');
+          lines[i],
+          'event_${date.millisecondsSinceEpoch}_$i',
+        );
         events.add(event);
       } catch (e) {
         // Skip malformed lines
@@ -83,8 +86,11 @@ class StorageServiceWeb implements StorageService {
 
   @override
   Future<void> updateEvent(DateTime originalDate, Event updatedEvent) async {
-    final newDate = DateTime(updatedEvent.start.year, updatedEvent.start.month,
-        updatedEvent.start.day);
+    final newDate = DateTime(
+      updatedEvent.start.year,
+      updatedEvent.start.month,
+      updatedEvent.start.day,
+    );
 
     if (originalDate != newDate) {
       await deleteEvent(originalDate, updatedEvent.id);

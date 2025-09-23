@@ -12,8 +12,9 @@ class NotificationService {
   static Future<void> initialize() async {
     if (_initialized) return;
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -74,10 +75,7 @@ class NotificationService {
           'Start Feeding',
           icon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
-        const AndroidNotificationAction(
-          'ignore',
-          'Ignore',
-        ),
+        const AndroidNotificationAction('ignore', 'Ignore'),
       ],
     );
 
@@ -108,10 +106,12 @@ class NotificationService {
     // Cancel any existing reminders
     await cancelAllReminders();
 
-    final reminderTime = lastFeedingEnd
-        .add(const Duration(hours: AppConstants.defaultReminderHours));
-    final urgentTime = lastFeedingEnd
-        .add(const Duration(hours: AppConstants.urgentReminderHours));
+    final reminderTime = lastFeedingEnd.add(
+      const Duration(hours: AppConstants.defaultReminderHours),
+    );
+    final urgentTime = lastFeedingEnd.add(
+      const Duration(hours: AppConstants.urgentReminderHours),
+    );
 
     // Schedule regular reminder
     if (reminderTime.isAfter(DateTime.now())) {
@@ -234,7 +234,7 @@ class NotificationService {
 
   // Get pending notifications (for debugging)
   static Future<List<PendingNotificationRequest>>
-      getPendingNotifications() async {
+  getPendingNotifications() async {
     return await _notifications.pendingNotificationRequests();
   }
 }

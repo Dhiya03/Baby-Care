@@ -12,6 +12,7 @@ class FeedingTimerScreen extends ConsumerStatefulWidget {
 
 class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
   final TextEditingController _notesController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -26,12 +27,9 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
 
     // If not feeding, redirect back
     if (!timerState.isFeeding) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pop();
-      });
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      // The user has stopped the feeding, and the pop is handled in the _stopFeeding method.
+      // This guard prevents a double-pop issue by simply showing a loader for a frame.
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -77,11 +75,11 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                       ),
                       child: Text(
                         timerState.formattedDuration,
-                        style:
-                            Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 48,
-                                ),
+                        style: Theme.of(context).textTheme.headlineLarge
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 48,
+                            ),
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacing),
@@ -90,8 +88,8 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                       Text(
                         'Started at ${_formatTime(timerState.startTime!)}',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                          color: Colors.grey[600],
+                        ),
                       ),
                   ],
                 ),
@@ -116,38 +114,45 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
               width: double.infinity,
               height: AppConstants.buttonHeight,
               child: ElevatedButton(
-                onPressed: () => _stopFeeding(timerNotifier),
+                onPressed: _isLoading
+                    ? null
+                    : () => _stopFeeding(timerNotifier),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.secondary,
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppConstants.buttonRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.buttonRadius,
+                    ),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.stop, size: 32),
-                    const SizedBox(width: AppConstants.spacing),
-                    Text(
-                      'End Feeding',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium
-                          ?.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            fontWeight: FontWeight.bold,
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.stop, size: 32),
+                          const SizedBox(width: AppConstants.spacing),
+                          Text(
+                            'End Feeding',
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSecondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
-                    ),
-                  ],
-                ),
+                        ],
+                      ),
               ),
             ),
             const SizedBox(height: AppConstants.spacing),
 
             // Cancel button
             TextButton(
-              onPressed: () => _showCancelDialog(),
+              onPressed: _isLoading ? null : () => _showCancelDialog(),
               child: const Text('Cancel Feeding'),
             ),
           ],
@@ -161,6 +166,10 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
   }
 
   void _stopFeeding(FeedingTimerNotifier timerNotifier) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final notes = _notesController.text.trim().isEmpty
         ? AppConstants.defaultNotes
         : _notesController.text.trim();
@@ -187,6 +196,12 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
             backgroundColor: Colors.red,
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }

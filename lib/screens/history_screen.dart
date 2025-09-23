@@ -59,7 +59,10 @@ class HistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildDateSelector(
-      BuildContext context, WidgetRef ref, DateTime selectedDate) {
+    BuildContext context,
+    WidgetRef ref,
+    DateTime selectedDate,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacing),
       child: Card(
@@ -81,16 +84,14 @@ class HistoryScreen extends ConsumerWidget {
                   children: [
                     Text(
                       _formatDateHeader(selectedDate),
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     Text(
                       DateFormat('EEEE, MMM d, y').format(selectedDate),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -109,7 +110,10 @@ class HistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildHistoryContent(
-      BuildContext context, WidgetRef ref, DayHistory dayHistory) {
+    BuildContext context,
+    WidgetRef ref,
+    DayHistory dayHistory,
+  ) {
     if (!dayHistory.hasEvents) {
       return Center(
         child: Column(
@@ -119,10 +123,9 @@ class HistoryScreen extends ConsumerWidget {
             const SizedBox(height: AppConstants.spacing),
             Text(
               'No events recorded for this day',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(color: Colors.grey[600]),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: AppConstants.spacing),
             ElevatedButton(
@@ -149,33 +152,45 @@ class HistoryScreen extends ConsumerWidget {
           // Events by type
           if (dayHistory.feedingEvents.isNotEmpty) ...[
             _buildSectionHeader(
-                context, 'Feeding Sessions', dayHistory.feedingCount),
-            ...dayHistory.feedingEvents.map((event) => EventCard(
-                  event: event,
-                  onTap: () => _editEvent(context, ref, event),
-                  onDelete: () => _deleteEvent(context, ref, event),
-                )),
+              context,
+              'Feeding Sessions',
+              dayHistory.feedingCount,
+            ),
+            ...dayHistory.feedingEvents.map(
+              (event) => EventCard(
+                event: event,
+                onTap: () => _editEvent(context, ref, event),
+                onDelete: () => _deleteEvent(context, ref, event),
+              ),
+            ),
             const SizedBox(height: AppConstants.spacing),
           ],
 
           if (dayHistory.urinationEvents.isNotEmpty) ...[
             _buildSectionHeader(
-                context, 'Urination', dayHistory.urinationCount),
-            ...dayHistory.urinationEvents.map((event) => EventCard(
-                  event: event,
-                  onTap: () => _editEvent(context, ref, event),
-                  onDelete: () => _deleteEvent(context, ref, event),
-                )),
+              context,
+              'Urination',
+              dayHistory.urinationCount,
+            ),
+            ...dayHistory.urinationEvents.map(
+              (event) => EventCard(
+                event: event,
+                onTap: () => _editEvent(context, ref, event),
+                onDelete: () => _deleteEvent(context, ref, event),
+              ),
+            ),
             const SizedBox(height: AppConstants.spacing),
           ],
 
           if (dayHistory.stoolEvents.isNotEmpty) ...[
             _buildSectionHeader(context, 'Stool', dayHistory.stoolCount),
-            ...dayHistory.stoolEvents.map((event) => EventCard(
-                  event: event,
-                  onTap: () => _editEvent(context, ref, event),
-                  onDelete: () => _deleteEvent(context, ref, event),
-                )),
+            ...dayHistory.stoolEvents.map(
+              (event) => EventCard(
+                event: event,
+                onTap: () => _editEvent(context, ref, event),
+                onDelete: () => _deleteEvent(context, ref, event),
+              ),
+            ),
           ],
         ],
       ),
@@ -191,24 +206,32 @@ class HistoryScreen extends ConsumerWidget {
           children: [
             Text(
               'Daily Summary',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppConstants.spacing / 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildSummaryItem(
-                    context,
-                    'Feeding',
-                    '${dayHistory.feedingCount}',
-                    '${dayHistory.totalFeedingMinutes}m total'),
+                  context,
+                  'Feeding',
+                  '${dayHistory.feedingCount}',
+                  '${dayHistory.totalFeedingMinutes}m total',
+                ),
                 _buildSummaryItem(
-                    context, 'Urine', '${dayHistory.urinationCount}', ''),
+                  context,
+                  'Urine',
+                  '${dayHistory.urinationCount}',
+                  '',
+                ),
                 _buildSummaryItem(
-                    context, 'Stool', '${dayHistory.stoolCount}', ''),
+                  context,
+                  'Stool',
+                  '${dayHistory.stoolCount}',
+                  '',
+                ),
               ],
             ),
           ],
@@ -218,22 +241,27 @@ class HistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildSummaryItem(
-      BuildContext context, String label, String count, String detail) {
+    BuildContext context,
+    String label,
+    String count,
+    String detail,
+  ) {
     return Column(
       children: [
         Text(
           count,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor,
+          ),
         ),
         Text(label, style: Theme.of(context).textTheme.bodyMedium),
         if (detail.isNotEmpty)
           Text(
             detail,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
           ),
       ],
     );
@@ -251,10 +279,9 @@ class HistoryScreen extends ConsumerWidget {
           const SizedBox(width: AppConstants.spacing / 2),
           Text(
             '$title ($count)',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -298,7 +325,10 @@ class HistoryScreen extends ConsumerWidget {
   }
 
   void _showDatePicker(
-      BuildContext context, WidgetRef ref, DateTime selectedDate) async {
+    BuildContext context,
+    WidgetRef ref,
+    DateTime selectedDate,
+  ) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -328,7 +358,8 @@ class HistoryScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Delete Event?'),
         content: Text(
-            'Are you sure you want to delete this ${event.type.toLowerCase()} event?'),
+          'Are you sure you want to delete this ${event.type.toLowerCase()} event?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -338,10 +369,9 @@ class HistoryScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await ref.read(eventActionsProvider).deleteEvent(
-                      ref.read(selectedDateProvider),
-                      event.id,
-                    );
+                await ref
+                    .read(eventActionsProvider)
+                    .deleteEvent(ref.read(selectedDateProvider), event.id);
                 if (context.mounted) {
                   // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -372,9 +402,9 @@ class HistoryScreen extends ConsumerWidget {
 
   void _exportDay(BuildContext context, WidgetRef ref) async {
     try {
-      final bool success = await ref.read(eventActionsProvider).exportDay(
-            ref.read(selectedDateProvider),
-          );
+      final bool success = await ref
+          .read(eventActionsProvider)
+          .exportDay(ref.read(selectedDateProvider));
 
       // ignore: use_build_context_synchronously
       if (context.mounted && !success) {

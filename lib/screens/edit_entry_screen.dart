@@ -64,10 +64,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
               ),
             )
           else
-            IconButton(
-              icon: const Icon(Icons.save),
-              onPressed: _saveChanges,
-            ),
+            IconButton(icon: const Icon(Icons.save), onPressed: _saveChanges),
         ],
       ),
       body: Form(
@@ -94,10 +91,8 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                           ),
                           Text(
                             'Created: ${DateFormat('MMM d, y HH:mm').format(_originalEvent.start)}',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey[600]),
                           ),
                         ],
                       ),
@@ -190,12 +185,34 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
       children: [
         // Start date/time
         Card(
-          child: ListTile(
-            leading: const Icon(Icons.play_arrow),
-            title: const Text('Start Time'),
-            subtitle: Text(DateFormat('MMM d, y HH:mm').format(_startDateTime)),
-            trailing: const Icon(Icons.edit),
-            onTap: () => _selectStartDateTime(),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.play_arrow),
+                  title: const Text('Start'),
+                  subtitle: Text(
+                    DateFormat('MMM d, y HH:mm').format(_startDateTime),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _selectStartDate,
+                      icon: const Icon(Icons.calendar_today, size: 18),
+                      label: const Text('Edit Date'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _selectStartTime,
+                      icon: const Icon(Icons.access_time, size: 18),
+                      label: const Text('Edit Time'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -203,14 +220,36 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
         if (_originalEvent.isFeeding) ...[
           const SizedBox(height: AppConstants.spacing / 2),
           Card(
-            child: ListTile(
-              leading: const Icon(Icons.stop),
-              title: const Text('End Time'),
-              subtitle: Text(_endDateTime != null
-                  ? DateFormat('MMM d, y HH:mm').format(_endDateTime!)
-                  : 'Not set'),
-              trailing: const Icon(Icons.edit),
-              onTap: () => _selectEndDateTime(),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.stop),
+                    title: const Text('End'),
+                    subtitle: Text(
+                      _endDateTime != null
+                          ? DateFormat('MMM d, y HH:mm').format(_endDateTime!)
+                          : 'Not set',
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: _selectEndDate,
+                        icon: const Icon(Icons.calendar_today, size: 18),
+                        label: const Text('Edit Date'),
+                      ),
+                      TextButton.icon(
+                        onPressed: _selectEndTime,
+                        icon: const Icon(Icons.access_time, size: 18),
+                        label: const Text('Edit Time'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -229,9 +268,9 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                   Text(
                     'Duration: ${_calculateDuration()}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                 ],
               ),
@@ -256,40 +295,53 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
     return '${minutes}m';
   }
 
-  Future<void> _selectStartDateTime() async {
+  Future<void> _selectStartDate() async {
     final date = await showDatePicker(
       context: context,
       initialDate: _startDateTime,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-
-    if (date != null && mounted) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_startDateTime),
-      );
-
-      if (time != null) {
-        setState(() {
-          _startDateTime = DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-          );
-
-          // Adjust end time if it's before start time
-          if (_endDateTime != null && _endDateTime!.isBefore(_startDateTime)) {
-            _endDateTime = _startDateTime.add(const Duration(minutes: 20));
-          }
-        });
-      }
+    if (date != null) {
+      setState(() {
+        _startDateTime = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          _startDateTime.hour,
+          _startDateTime.minute,
+        );
+        // Adjust end time if it's before start time
+        if (_endDateTime != null && _endDateTime!.isBefore(_startDateTime)) {
+          _endDateTime = _startDateTime.add(const Duration(minutes: 20));
+        }
+      });
     }
   }
 
-  Future<void> _selectEndDateTime() async {
+  Future<void> _selectStartTime() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_startDateTime),
+    );
+    if (time != null) {
+      setState(() {
+        _startDateTime = DateTime(
+          _startDateTime.year,
+          _startDateTime.month,
+          _startDateTime.day,
+          time.hour,
+          time.minute,
+        );
+        // Adjust end time if it's before start time
+        if (_endDateTime != null && _endDateTime!.isBefore(_startDateTime)) {
+          _endDateTime = _startDateTime.add(const Duration(minutes: 20));
+        }
+      });
+    }
+  }
+
+  Future<void> _selectEndDate() async {
     if (!_originalEvent.isFeeding) return;
 
     final date = await showDatePicker(
@@ -298,34 +350,55 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
       firstDate: _startDateTime,
       lastDate: DateTime.now(),
     );
+    if (date != null) {
+      final newEndTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        _endDateTime?.hour ?? _startDateTime.hour,
+        _endDateTime?.minute ?? _startDateTime.minute,
+      );
+      if (newEndTime.isAfter(_startDateTime)) {
+        setState(() {
+          _endDateTime = newEndTime;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('End time must be after start time'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
 
-    if (date != null && mounted) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_endDateTime ?? _startDateTime),
+  Future<void> _selectEndTime() async {
+    if (!_originalEvent.isFeeding) return;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_endDateTime ?? _startDateTime),
+    );
+    if (time != null) {
+      final newEndTime = DateTime(
+        _endDateTime?.year ?? _startDateTime.year,
+        _endDateTime?.month ?? _startDateTime.month,
+        _endDateTime?.day ?? _startDateTime.day,
+        time.hour,
+        time.minute,
       );
 
-      if (time != null) {
-        final newEndTime = DateTime(
-          date.year,
-          date.month,
-          date.day,
-          time.hour,
-          time.minute,
+      if (newEndTime.isAfter(_startDateTime)) {
+        setState(() {
+          _endDateTime = newEndTime;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('End time must be after start time'),
+            backgroundColor: Colors.orange,
+          ),
         );
-
-        if (newEndTime.isAfter(_startDateTime)) {
-          setState(() {
-            _endDateTime = newEndTime;
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('End time must be after start time'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
       }
     }
   }

@@ -132,5 +132,5 @@ class FeedingTimerNotifier extends StateNotifier<FeedingTimerState> {
 // Provider
 final feedingTimerProvider =
     StateNotifierProvider<FeedingTimerNotifier, FeedingTimerState>((ref) {
-  return FeedingTimerNotifier(ref);
-});
+      return FeedingTimerNotifier(ref);
+    });

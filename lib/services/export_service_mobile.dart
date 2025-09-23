@@ -64,7 +64,8 @@ class ExportServiceMobile implements ExportService {
 
       final tempDirPath = await _storageService.getAppDirectoryPath();
       final tempFile = File(
-          '$tempDirPath/summary_${DateFormat('yyyy-MM-dd').format(startDate)}_to_${DateFormat('yyyy-MM-dd').format(endDate)}.txt');
+        '$tempDirPath/summary_${DateFormat('yyyy-MM-dd').format(startDate)}_to_${DateFormat('yyyy-MM-dd').format(endDate)}.txt',
+      );
 
       await tempFile.writeAsString(report);
 
@@ -123,19 +124,26 @@ class ExportServiceMobile implements ExportService {
   @override
   Future<void> exportMonthlySummary(DateTime month) async {
     final monthStart = DateTime(month.year, month.month, 1);
-    final monthEnd =
-        DateTime(month.year, month.month + 1, 0); // Last day of month
+    final monthEnd = DateTime(
+      month.year,
+      month.month + 1,
+      0,
+    ); // Last day of month
     await exportSummaryReport(monthStart, monthEnd);
   }
 
   Future<String> _createSummaryReport(
-      DateTime startDate, DateTime endDate) async {
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
     final buffer = StringBuffer();
     buffer.writeln('Baby Care Summary Report');
     buffer.writeln(
-        'Period: ${DateFormat('MMM d, y').format(startDate)} - ${DateFormat('MMM d, y').format(endDate)}');
+      'Period: ${DateFormat('MMM d, y').format(startDate)} - ${DateFormat('MMM d, y').format(endDate)}',
+    );
     buffer.writeln(
-        'Generated: ${DateFormat('MMM d, y HH:mm').format(DateTime.now())}');
+      'Generated: ${DateFormat('MMM d, y HH:mm').format(DateTime.now())}',
+    );
     buffer.writeln();
     buffer.writeln('=' * 50);
     buffer.writeln();
@@ -158,9 +166,11 @@ class ExportServiceMobile implements ExportService {
         totalUrinations += dayHistory.urinationCount;
         totalStools += dayHistory.stoolCount;
 
-        dailyStats.add('${DateFormat('MMM d').format(current)}: '
-            '${dayHistory.feedingCount}F (${dayHistory.totalFeedingMinutes}m), '
-            '${dayHistory.urinationCount}U, ${dayHistory.stoolCount}S');
+        dailyStats.add(
+          '${DateFormat('MMM d').format(current)}: '
+          '${dayHistory.feedingCount}F (${dayHistory.totalFeedingMinutes}m), '
+          '${dayHistory.urinationCount}U, ${dayHistory.stoolCount}S',
+        );
       }
     }
 
@@ -168,10 +178,12 @@ class ExportServiceMobile implements ExportService {
     buffer.writeln('-' * 20);
     buffer.writeln('Days with data: $totalDays');
     buffer.writeln('Total feedings: $totalFeedings');
-    buffer
-        .writeln('Total feeding time: ${_formatDuration(totalFeedingMinutes)}');
     buffer.writeln(
-        'Average feeding time: ${totalFeedings > 0 ? _formatDuration(totalFeedingMinutes ~/ totalFeedings) : '0m'}');
+      'Total feeding time: ${_formatDuration(totalFeedingMinutes)}',
+    );
+    buffer.writeln(
+      'Average feeding time: ${totalFeedings > 0 ? _formatDuration(totalFeedingMinutes ~/ totalFeedings) : '0m'}',
+    );
     buffer.writeln('Total urinations: $totalUrinations');
     buffer.writeln('Total stools: $totalStools');
     buffer.writeln();
@@ -179,13 +191,17 @@ class ExportServiceMobile implements ExportService {
     if (totalDays > 0) {
       buffer.writeln('Daily averages:');
       buffer.writeln(
-          '- Feedings: ${(totalFeedings / totalDays).toStringAsFixed(1)} per day');
+        '- Feedings: ${(totalFeedings / totalDays).toStringAsFixed(1)} per day',
+      );
       buffer.writeln(
-          '- Feeding time: ${_formatDuration((totalFeedingMinutes / totalDays).round())} per day');
+        '- Feeding time: ${_formatDuration((totalFeedingMinutes / totalDays).round())} per day',
+      );
       buffer.writeln(
-          '- Urinations: ${(totalUrinations / totalDays).toStringAsFixed(1)} per day');
+        '- Urinations: ${(totalUrinations / totalDays).toStringAsFixed(1)} per day',
+      );
       buffer.writeln(
-          '- Stools: ${(totalStools / totalDays).toStringAsFixed(1)} per day');
+        '- Stools: ${(totalStools / totalDays).toStringAsFixed(1)} per day',
+      );
       buffer.writeln();
     }
 

@@ -59,11 +59,7 @@ class IconConstants {
       fit: fit,
       errorBuilder: (context, error, stackTrace) {
         // Fallback to material icon if asset not found
-        return Icon(
-          _getFallbackIcon(assetPath),
-          size: size,
-          color: color,
-        );
+        return Icon(_getFallbackIcon(assetPath), size: size, color: color);
       },
     );
   }

@@ -11,8 +11,9 @@ class FileHelper {
   // Get baby history directory
   static Future<Directory> getBabyHistoryDirectory() async {
     final docs = await getDocumentsDirectory();
-    final historyDir =
-        Directory('${docs.path}/${AppConstants.historyFolderName}');
+    final historyDir = Directory(
+      '${docs.path}/${AppConstants.historyFolderName}',
+    );
 
     if (!await historyDir.exists()) {
       await historyDir.create(recursive: true);
@@ -63,9 +64,11 @@ class FileHelper {
       final entities = await historyDir.list().toList();
 
       return entities
-          .where((entity) =>
-              entity is File &&
-              entity.path.endsWith(AppConstants.fileExtension))
+          .where(
+            (entity) =>
+                entity is File &&
+                entity.path.endsWith(AppConstants.fileExtension),
+          )
           .cast<File>()
           .toList();
     } catch (e) {
@@ -179,7 +182,9 @@ class FileHelper {
 
   // Atomic file write (write to temp file, then rename)
   static Future<void> writeFileAtomically(
-      String filePath, String content) async {
+    String filePath,
+    String content,
+  ) async {
     final tempPath = '$filePath.tmp';
     final tempFile = File(tempPath);
     final targetFile = File(filePath);

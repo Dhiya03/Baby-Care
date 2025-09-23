@@ -63,8 +63,11 @@ class DateHelper {
   // Check if date is yesterday
   static bool isYesterday(DateTime date) {
     final now = DateTime.now();
-    final yesterday = DateTime(now.year, now.month, now.day)
-        .subtract(const Duration(days: 1));
+    final yesterday = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 1));
     final dateOnly = DateTime(date.year, date.month, date.day);
     return dateOnly == yesterday;
   }

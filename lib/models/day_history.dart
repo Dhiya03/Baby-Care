@@ -5,10 +5,7 @@ class DayHistory {
   final DateTime date;
   final List<Event> events;
 
-  DayHistory({
-    required this.date,
-    required this.events,
-  });
+  DayHistory({required this.date, required this.events});
 
   // Get events by type
   List<Event> get feedingEvents =>
@@ -58,8 +55,9 @@ class DayHistory {
 
   // Update event
   DayHistory updateEvent(Event updatedEvent) {
-    final newEvents =
-        events.map((e) => e.id == updatedEvent.id ? updatedEvent : e).toList();
+    final newEvents = events
+        .map((e) => e.id == updatedEvent.id ? updatedEvent : e)
+        .toList();
     return DayHistory(date: date, events: newEvents);
   }
 

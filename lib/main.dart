@@ -8,9 +8,5 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize timezone database
   tz.initializeTimeZones();
-  runApp(
-    const ProviderScope(
-      child: BabyCareApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: BabyCareApp()));
 }

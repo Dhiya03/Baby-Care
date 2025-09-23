@@ -13,8 +13,9 @@ class StorageServiceMobile implements StorageService {
   // Get history directory
   Future<Directory> _getHistoryDir() async {
     final dir = await getApplicationDocumentsDirectory();
-    final historyDir =
-        Directory('${dir.path}/${AppConstants.historyFolderName}');
+    final historyDir = Directory(
+      '${dir.path}/${AppConstants.historyFolderName}',
+    );
     if (!await historyDir.exists()) {
       await historyDir.create(recursive: true);
     }
@@ -71,7 +72,9 @@ class StorageServiceMobile implements StorageService {
     for (int i = 0; i < lines.length; i++) {
       try {
         final event = Event.fromFileLine(
-            lines[i], 'event_${date.millisecondsSinceEpoch}_$i');
+          lines[i],
+          'event_${date.millisecondsSinceEpoch}_$i',
+        );
         events.add(event);
       } catch (e) {
         // Skip malformed lines
@@ -106,13 +109,17 @@ class StorageServiceMobile implements StorageService {
 
   @override
   Future<void> updateEvent(DateTime originalDate, Event updatedEvent) async {
-    final newDate = DateTime(updatedEvent.start.year, updatedEvent.start.month,
-        updatedEvent.start.day);
+    final newDate = DateTime(
+      updatedEvent.start.year,
+      updatedEvent.start.month,
+      updatedEvent.start.day,
+    );
 
     if (originalDate != newDate) {
       final originalDayHistory = await loadDayHistory(originalDate);
-      final updatedOriginalHistory =
-          originalDayHistory.removeEvent(updatedEvent.id);
+      final updatedOriginalHistory = originalDayHistory.removeEvent(
+        updatedEvent.id,
+      );
       await updateDayHistory(updatedOriginalHistory);
 
       final newDayHistory = await loadDayHistory(newDate);
@@ -131,9 +138,11 @@ class StorageServiceMobile implements StorageService {
       final historyDir = await _getHistoryDir();
       final files = await historyDir
           .list()
-          .where((entity) =>
-              entity is File &&
-              entity.path.endsWith(AppConstants.fileExtension))
+          .where(
+            (entity) =>
+                entity is File &&
+                entity.path.endsWith(AppConstants.fileExtension),
+          )
           .cast<File>()
           .toList();
 

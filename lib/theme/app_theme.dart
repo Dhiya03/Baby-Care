@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
 
 class AppTheme {
   // Color constants
@@ -46,7 +47,7 @@ class AppTheme {
         color: lightPink,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
         ),
       ),
       textTheme: const TextTheme(

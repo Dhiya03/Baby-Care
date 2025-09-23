@@ -109,8 +109,11 @@ class EventActions {
 
   // Change selected date
   void selectDate(DateTime date) {
-    ref.read(selectedDateProvider.notifier).state =
-        DateTime(date.year, date.month, date.day);
+    ref.read(selectedDateProvider.notifier).state = DateTime(
+      date.year,
+      date.month,
+      date.day,
+    );
   }
 
   // Export day's history

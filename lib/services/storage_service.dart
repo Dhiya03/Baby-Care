@@ -1,5 +1,3 @@
-import 'storage_service_mobile.dart'
-    if (dart.library.html) 'storage_service_web.dart';
 import '../models/event.dart';
 import '../models/day_history.dart';
 
