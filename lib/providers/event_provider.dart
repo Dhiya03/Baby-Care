@@ -1,17 +1,25 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/event.dart';
 import '../models/day_history.dart';
 import '../services/storage_service.dart';
+import '../services/storage_service_mobile.dart';
+import '../services/storage_service_web.dart';
 import '../services/export_service.dart';
+import '../services/export_service_mobile.dart';
+import '../services/export_service_web.dart';
 import '../utils/constants.dart';
 
 // Storage service provider
-final storageServiceProvider =
-    Provider<StorageService>((ref) => StorageService());
+final storageServiceProvider = Provider<StorageService>((ref) {
+  return kIsWeb ? StorageServiceWeb() : StorageServiceMobile();
+});
 
 // Export service provider
 final exportServiceProvider = Provider<ExportService>((ref) {
-  return ExportService(ref.watch(storageServiceProvider));
+  return kIsWeb
+      ? ExportServiceWeb(ref.watch(storageServiceProvider))
+      : ExportServiceMobile(ref.watch(storageServiceProvider));
 });
 
 // Current selected date provider
