@@ -19,10 +19,8 @@ class HistoryScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('History'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () => _exportDay(context, ref),
-          ),
+          // Enhanced export button with multiple options
+          _buildExportButton(context, ref, selectedDate),
         ],
       ),
       body: Column(
@@ -58,6 +56,200 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
+  // Enhanced export button with dropdown menu
+  Widget _buildExportButton(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime selectedDate,
+  ) {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.share),
+      tooltip: 'Export Data',
+      onSelected: (value) =>
+          _handleExportAction(context, ref, value, selectedDate),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'day',
+          child: ListTile(
+            leading: Icon(Icons.today),
+            title: Text('Export Today'),
+            subtitle: Text('Share today\'s data'),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'week',
+          child: ListTile(
+            leading: Icon(Icons.date_range),
+            title: Text('Export Week'),
+            subtitle: Text('Last 7 days'),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'month',
+          child: ListTile(
+            leading: Icon(Icons.calendar_month),
+            title: Text('Export Month'),
+            subtitle: Text('Current month'),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'csv',
+          child: ListTile(
+            leading: Icon(Icons.table_chart),
+            title: Text('Export as CSV'),
+            subtitle: Text('Spreadsheet format'),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'medical',
+          child: ListTile(
+            leading: Icon(Icons.medical_services),
+            title: Text('Medical Report'),
+            subtitle: Text('For healthcare provider'),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'all',
+          child: ListTile(
+            leading: Icon(Icons.archive),
+            title: Text('Export All'),
+            subtitle: Text('Complete history'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleExportAction(
+    BuildContext context,
+    WidgetRef ref,
+    String action,
+    DateTime selectedDate,
+  ) {
+    switch (action) {
+      case 'day':
+        _exportDay(context, ref);
+        break;
+      case 'week':
+        final weekAgo = selectedDate.subtract(const Duration(days: 6));
+        _exportDateRange(context, ref, weekAgo, selectedDate);
+        break;
+      case 'month':
+        final monthStart = DateTime(selectedDate.year, selectedDate.month, 1);
+        final monthEnd = DateTime(selectedDate.year, selectedDate.month + 1, 0);
+        _exportDateRange(context, ref, monthStart, monthEnd);
+        break;
+      case 'csv':
+        _showDateRangeDialog(context, ref, 'csv', selectedDate);
+        break;
+      case 'medical':
+        _showDateRangeDialog(context, ref, 'medical', selectedDate);
+        break;
+      case 'all':
+        _showExportAllDialog(context, ref);
+        break;
+    }
+  }
+
+  void _showDateRangeDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String exportType,
+    DateTime selectedDate,
+  ) {
+    DateTime startDate = selectedDate.subtract(const Duration(days: 30));
+    DateTime endDate = selectedDate;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Select Date Range'),
+        content: StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Start Date'),
+                subtitle: Text(DateFormat('MMM d, y').format(startDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: startDate,
+                    firstDate: DateTime(2020),
+                    lastDate: endDate,
+                  );
+                  if (picked != null) {
+                    setState(() => startDate = picked);
+                  }
+                },
+              ),
+              ListTile(
+                title: const Text('End Date'),
+                subtitle: Text(DateFormat('MMM d, y').format(endDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: endDate,
+                    firstDate: startDate,
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() => endDate = picked);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (exportType == 'csv') {
+                _exportAsCSV(context, ref, startDate, endDate);
+              } else if (exportType == 'medical') {
+                _exportMedicalReport(context, ref, startDate, endDate);
+              }
+            },
+            child: const Text('Export'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showExportAllDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Export All Data?'),
+        content: const Text(
+          'This will export all your baby\'s history files. '
+          'This may take a few moments and create multiple files.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _exportAllData(context, ref);
+            },
+            child: const Text('Export All'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDateSelector(
     BuildContext context,
     WidgetRef ref,
@@ -84,7 +276,9 @@ class HistoryScreen extends ConsumerWidget {
                   children: [
                     Text(
                       _formatDateHeader(selectedDate),
-                      style: Theme.of(context).textTheme.headlineSmall
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     Text(
@@ -251,9 +445,9 @@ class HistoryScreen extends ConsumerWidget {
         Text(
           count,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
-          ),
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
         ),
         Text(label, style: Theme.of(context).textTheme.bodyMedium),
         if (detail.isNotEmpty)
@@ -373,7 +567,6 @@ class HistoryScreen extends ConsumerWidget {
                     .read(eventActionsProvider)
                     .deleteEvent(ref.read(selectedDateProvider), event.id);
                 if (context.mounted) {
-                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Event deleted'),
@@ -382,7 +575,6 @@ class HistoryScreen extends ConsumerWidget {
                   );
                 }
               } catch (e) {
-                // ignore: use_build_context_synchronously
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -400,13 +592,13 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
+  // Enhanced export methods
   void _exportDay(BuildContext context, WidgetRef ref) async {
     try {
-      final bool success = await ref
+      final success = await ref
           .read(eventActionsProvider)
           .exportDay(ref.read(selectedDateProvider));
 
-      // ignore: use_build_context_synchronously
       if (context.mounted && !success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -414,13 +606,138 @@ class HistoryScreen extends ConsumerWidget {
             backgroundColor: Colors.orange,
           ),
         );
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Day exported successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
-      // ignore: use_build_context_synchronously
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error exporting: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _exportDateRange(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final success = await ref
+          .read(eventActionsProvider)
+          .exportDateRange(startDate, endDate);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'Date range exported successfully!'
+                  : 'No data to export for selected range',
+            ),
+            backgroundColor: success ? Colors.green : Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error exporting date range: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _exportAsCSV(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      await ref.read(eventActionsProvider).exportAsCSV(startDate, endDate);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('CSV file exported successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error exporting CSV: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _exportMedicalReport(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      await ref
+          .read(eventActionsProvider)
+          .exportMedicalReport(startDate, endDate);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Medical report exported successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error exporting medical report: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _exportAllData(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(eventActionsProvider).exportAllData();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('All data exported successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error exporting all data: $e'),
             backgroundColor: Colors.red,
           ),
         );

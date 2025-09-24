@@ -55,9 +55,8 @@ class DayHistory {
 
   // Update event
   DayHistory updateEvent(Event updatedEvent) {
-    final newEvents = events
-        .map((e) => e.id == updatedEvent.id ? updatedEvent : e)
-        .toList();
+    final newEvents =
+        events.map((e) => e.id == updatedEvent.id ? updatedEvent : e).toList();
     return DayHistory(date: date, events: newEvents);
   }
 

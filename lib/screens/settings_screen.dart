@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../providers/settings_provider.dart';
+import '../providers/event_provider.dart';
 import '../utils/constants.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -89,23 +91,60 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppConstants.spacing),
 
-          // Data management section
+          // Enhanced data management section
           Card(
             child: Column(
               children: [
                 const ListTile(
                   leading: Icon(Icons.storage),
                   title: Text('Data Management'),
-                  subtitle: Text('Manage your baby\'s history data'),
+                  subtitle: Text('Export and manage your baby\'s history data'),
                 ),
                 const Divider(height: 1),
+
+                // Enhanced export options
                 ListTile(
-                  leading: const Icon(Icons.folder),
+                  leading: const Icon(Icons.archive),
                   title: const Text('Export All Data'),
-                  subtitle: const Text('Share all history files'),
-                  trailing: const Icon(Icons.share),
+                  subtitle: const Text('Complete history backup'),
+                  trailing: const Icon(Icons.chevron_right),
                   onTap: () => _exportAllData(context, ref),
                 ),
+
+                ListTile(
+                  leading: const Icon(Icons.medical_services),
+                  title: const Text('Medical Report'),
+                  subtitle: const Text(
+                    'Professional format for healthcare providers',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showMedicalReportDialog(context, ref),
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.table_chart),
+                  title: const Text('Export as CSV'),
+                  subtitle: const Text('Spreadsheet format for analysis'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showCSVExportDialog(context, ref),
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.date_range),
+                  title: const Text('Weekly Summary'),
+                  subtitle: const Text('Last 7 days summary'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _exportWeeklySummary(context, ref),
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.calendar_month),
+                  title: const Text('Monthly Summary'),
+                  subtitle: const Text('Current month analysis'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _exportMonthlySummary(context, ref),
+                ),
+
                 ListTile(
                   leading: const Icon(Icons.info),
                   title: const Text('Storage Location'),
@@ -178,42 +217,280 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  // Enhanced export methods
   void _exportAllData(BuildContext context, WidgetRef ref) async {
-    try {
-      // This would implement exporting all available history files
-      // For now, show a placeholder dialog
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Export All Data'),
-          content: const Text(
-            'This feature will export all your baby\'s history files. '
-            'You can then share them with doctors or backup to cloud storage.',
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Export All Data'),
+        content: const Text(
+          'This will export all your baby\'s history files. '
+          'This may take a few moments and create multiple files.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Export feature coming soon!')),
-                );
-              },
-              child: const Text('Export'),
-            ),
-          ],
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await ref.read(eventActionsProvider).exportAllData();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('All data exported successfully!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error exporting all data: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Export All'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMedicalReportDialog(BuildContext context, WidgetRef ref) {
+    DateTime startDate = DateTime.now().subtract(const Duration(days: 30));
+    DateTime endDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Medical Report'),
+        content: StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'This will create a professional report suitable for sharing '
+                'with healthcare providers. The report includes feeding patterns, '
+                'statistics, and potential areas of concern.',
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                title: const Text('Start Date'),
+                subtitle: Text(DateFormat('MMM d, y').format(startDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: startDate,
+                    firstDate: DateTime(2020),
+                    lastDate: endDate,
+                  );
+                  if (picked != null) {
+                    setState(() => startDate = picked);
+                  }
+                },
+              ),
+              ListTile(
+                title: const Text('End Date'),
+                subtitle: Text(DateFormat('MMM d, y').format(endDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: endDate,
+                    firstDate: startDate,
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() => endDate = picked);
+                  }
+                },
+              ),
+            ],
+          ),
         ),
-      );
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await ref
+                    .read(eventActionsProvider)
+                    .exportMedicalReport(startDate, endDate);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Medical report exported successfully!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error exporting medical report: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Create Report'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCSVExportDialog(BuildContext context, WidgetRef ref) {
+    DateTime startDate = DateTime.now().subtract(const Duration(days: 7));
+    DateTime endDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Export CSV'),
+        content: StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'This will create a CSV file that can be opened in Excel, '
+                'Google Sheets, or other spreadsheet applications for analysis.',
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                title: const Text('Start Date'),
+                subtitle: Text(DateFormat('MMM d, y').format(startDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: startDate,
+                    firstDate: DateTime(2020),
+                    lastDate: endDate,
+                  );
+                  if (picked != null) {
+                    setState(() => startDate = picked);
+                  }
+                },
+              ),
+              ListTile(
+                title: const Text('End Date'),
+                subtitle: Text(DateFormat('MMM d, y').format(endDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: endDate,
+                    firstDate: startDate,
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() => endDate = picked);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await ref
+                    .read(eventActionsProvider)
+                    .exportAsCSV(startDate, endDate);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('CSV file exported successfully!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error exporting CSV: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Export CSV'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _exportWeeklySummary(BuildContext context, WidgetRef ref) async {
+    try {
+      final weekStart = DateTime.now().subtract(const Duration(days: 6));
+      await ref.read(eventActionsProvider).exportWeeklySummary(weekStart);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Weekly summary exported successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error exporting data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error exporting weekly summary: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _exportMonthlySummary(BuildContext context, WidgetRef ref) async {
+    try {
+      final now = DateTime.now();
+      await ref.read(eventActionsProvider).exportMonthlySummary(now);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Monthly summary exported successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error exporting monthly summary: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -236,10 +513,17 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             SizedBox(height: 16),
+            Text('File Format:'),
             Text('• One file per day (YYYY-MM-DD.txt)'),
-            Text('• Human-readable format'),
-            Text('• Easy to share with doctors'),
+            Text('• Human-readable CSV-like format'),
+            Text('• Easy to share with healthcare providers'),
             Text('• No cloud storage (privacy-first)'),
+            SizedBox(height: 16),
+            Text('Export Options:'),
+            Text('• Daily, weekly, or monthly summaries'),
+            Text('• CSV format for spreadsheet analysis'),
+            Text('• Medical reports for doctors'),
+            Text('• Complete history backup'),
           ],
         ),
         actions: [
@@ -273,12 +557,22 @@ class SettingsScreen extends ConsumerWidget {
               Text('📖 History: View and edit past events'),
               Text('⏰ Reminders: Get notified for feeding times'),
               SizedBox(height: 16),
+              Text(
+                'Export Features:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('• Medical Reports: Professional format for doctors'),
+              Text('• CSV Export: For analysis in spreadsheet apps'),
+              Text('• Weekly/Monthly: Automated summary reports'),
+              Text('• Complete Backup: Export all historical data'),
+              SizedBox(height: 16),
               Text('Tips:', style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
-              Text('• Use lock screen notifications for quick access'),
-              Text('• Add notes to track feeding details'),
-              Text('• Export daily files to share with doctors'),
-              Text('• Edit entries if you need to correct timing'),
+              Text('• Export medical reports before doctor visits'),
+              Text('• Use CSV export for detailed analysis'),
+              Text('• Regular backups ensure data safety'),
+              Text('• Add notes to provide context for healthcare providers'),
             ],
           ),
         ),
@@ -310,7 +604,7 @@ class SettingsScreen extends ConsumerWidget {
               Text('• All data is stored locally on your device'),
               Text('• No data is sent to external servers'),
               Text('• No account registration required'),
-              Text('• You control all data sharing'),
+              Text('• You control all data sharing through export features'),
               SizedBox(height: 16),
               Text(
                 'What We Store:',
@@ -329,7 +623,9 @@ class SettingsScreen extends ConsumerWidget {
               SizedBox(height: 8),
               Text('• Only when you explicitly export/share files'),
               Text('• You choose what to share and with whom'),
+              Text('• Multiple export formats for different needs'),
               Text('• No automatic data transmission'),
+              Text('• Medical reports are formatted for healthcare providers'),
             ],
           ),
         ),
@@ -350,7 +646,8 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('Clear All Data?'),
         content: const Text(
           'This will permanently delete ALL baby history data. '
-          'This action cannot be undone. Are you absolutely sure?',
+          'Consider exporting your data first as a backup. '
+          'This action cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -378,7 +675,8 @@ class SettingsScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Final Confirmation'),
         content: const Text(
-          'Type "DELETE" to confirm you want to permanently delete all baby history data.',
+          'This will permanently delete all baby history data. '
+          'Have you exported your data as a backup?',
         ),
         actions: [
           TextButton(
@@ -389,20 +687,24 @@ class SettingsScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                // This would implement clearing all data
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('All data cleared successfully'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                await ref.read(eventActionsProvider).clearAllData();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('All data cleared successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error clearing data: $e'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error clearing data: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             child: const Text(

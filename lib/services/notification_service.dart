@@ -13,7 +13,7 @@ class NotificationService {
     if (_initialized) return;
 
     const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
+      '@drawable/ic_launcher',
     );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -73,7 +73,7 @@ class NotificationService {
         const AndroidNotificationAction(
           'start_feeding',
           'Start Feeding',
-          icon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+          icon: DrawableResourceAndroidBitmap('@drawable/ic_launcher'),
         ),
         const AndroidNotificationAction('ignore', 'Ignore'),
       ],
@@ -167,7 +167,7 @@ class NotificationService {
         AndroidNotificationAction(
           'stop_feeding',
           'Stop Feeding',
-          icon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+          icon: DrawableResourceAndroidBitmap('@drawable/ic_launcher'),
         ),
       ],
     );
@@ -234,7 +234,7 @@ class NotificationService {
 
   // Get pending notifications (for debugging)
   static Future<List<PendingNotificationRequest>>
-  getPendingNotifications() async {
+      getPendingNotifications() async {
     return await _notifications.pendingNotificationRequests();
   }
 }

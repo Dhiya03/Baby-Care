@@ -21,4 +21,10 @@ abstract class ExportService {
 
   /// Exports a monthly summary report.
   Future<void> exportMonthlySummary(DateTime month);
+
+  /// Exports a date range as a CSV file.
+  Future<void> exportAsCSV(DateTime startDate, DateTime endDate);
+
+  /// Creates and shares a professional medical report for a date range.
+  Future<void> exportMedicalReport(DateTime startDate, DateTime endDate);
 }

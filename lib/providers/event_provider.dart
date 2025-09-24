@@ -120,4 +120,34 @@ class EventActions {
   Future<bool> exportDay(DateTime date) async {
     return await _export.exportDay(date);
   }
+
+  Future<bool> exportDateRange(DateTime startDate, DateTime endDate) async {
+    return await _export.exportDateRange(startDate, endDate);
+  }
+
+  Future<void> exportAsCSV(DateTime startDate, DateTime endDate) async {
+    await _export.exportAsCSV(startDate, endDate);
+  }
+
+  Future<void> exportMedicalReport(DateTime startDate, DateTime endDate) async {
+    await _export.exportMedicalReport(startDate, endDate);
+  }
+
+  Future<bool> exportAllData() async {
+    return await _export.exportAllData();
+  }
+
+  Future<void> exportWeeklySummary(DateTime weekStart) async {
+    await _export.exportWeeklySummary(weekStart);
+  }
+
+  Future<void> exportMonthlySummary(DateTime month) async {
+    await _export.exportMonthlySummary(month);
+  }
+
+  Future<void> clearAllData() async {
+    await _storage.clearAllData();
+    ref.invalidate(dayHistoryProvider);
+    ref.invalidate(availableDatesProvider);
+  }
 }

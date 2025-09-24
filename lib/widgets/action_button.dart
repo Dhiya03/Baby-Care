@@ -84,9 +84,8 @@ class FeedingButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isFeeding
-              ? theme.colorScheme.secondary
-              : theme.primaryColor,
+          backgroundColor:
+              isFeeding ? theme.colorScheme.secondary : theme.primaryColor,
           foregroundColor: theme.colorScheme.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.buttonRadius),

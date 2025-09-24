@@ -116,6 +116,41 @@ class ExportServiceMobile implements ExportService {
   }
 
   @override
+  Future<void> exportAsCSV(DateTime startDate, DateTime endDate) async {
+    try {
+      final csvData = await _createCSVData(startDate, endDate);
+      if (csvData.isEmpty) {
+        throw Exception('No data to export for the selected range.');
+      }
+
+      final tempDirPath = await _storageService.getAppDirectoryPath();
+      final tempFile = File(
+        '$tempDirPath/baby_care_export_${DateFormat('yyyyMMdd').format(startDate)}-${DateFormat('yyyyMMdd').format(endDate)}.csv',
+      );
+      await tempFile.writeAsString(csvData);
+
+      await Share.shareXFiles(
+        [XFile(tempFile.path)],
+        text: 'Baby Care History CSV',
+        subject: 'Baby Care CSV Export',
+      );
+
+      if (await tempFile.exists()) {
+        await tempFile.delete();
+      }
+    } catch (e) {
+      throw Exception('Failed to export as CSV: $e');
+    }
+  }
+
+  @override
+  Future<void> exportMedicalReport(DateTime startDate, DateTime endDate) async {
+    // For mobile, the medical report can be an enhanced version of the summary report.
+    // Currently, it uses the same implementation.
+    await exportSummaryReport(startDate, endDate);
+  }
+
+  @override
   Future<void> exportWeeklySummary(DateTime weekStart) async {
     final weekEnd = weekStart.add(const Duration(days: 6));
     await exportSummaryReport(weekStart, weekEnd);
@@ -130,6 +165,27 @@ class ExportServiceMobile implements ExportService {
       0,
     ); // Last day of month
     await exportSummaryReport(monthStart, monthEnd);
+  }
+
+  Future<String> _createCSVData(DateTime startDate, DateTime endDate) async {
+    final buffer = StringBuffer();
+    // CSV Header
+    buffer.writeln('id,type,start,end,duration_minutes,notes');
+
+    for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+      final current = startDate.add(Duration(days: i));
+      final dayHistory = await _storageService.loadDayHistory(current);
+      for (final event in dayHistory.events) {
+        final startIso = event.start.toIso8601String();
+        final endIso = event.end?.toIso8601String() ?? '';
+        // Escape quotes in notes for CSV safety
+        final notes = '"${event.notes.replaceAll('"', '""')}"';
+        buffer.writeln(
+          '${event.id},${event.type},$startIso,$endIso,${event.durationMinutes},$notes',
+        );
+      }
+    }
+    return buffer.toString();
   }
 
   Future<String> _createSummaryReport(

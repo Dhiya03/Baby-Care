@@ -19,41 +19,10 @@ env:
   JAVA_VERSION: '17'
 
 jobs:
-  # Create GitHub Release
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.get_version.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Get version
-        id: get_version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.get_version.outputs.version }}
-          name: Baby Care App ${{ steps.get_version.outputs.version }}
-          generate_release_notes: true
-          draft: false
-          prerelease: false
-
-  # Test and validate code before building the release
+  # Test and validate code before creating the release
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    needs: create-release
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -85,6 +54,37 @@ jobs:
       - name: Run tests
         if: steps.check-tests.outputs.tests_exist == 'true'
         run: flutter test --coverage
+
+  # Create GitHub Release
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: Baby Care App ${{ steps.get_version.outputs.version }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
 
   # Build and upload Android
   build-android:

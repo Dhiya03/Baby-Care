@@ -75,11 +75,11 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                       ),
                       child: Text(
                         timerState.formattedDuration,
-                        style: Theme.of(context).textTheme.headlineLarge
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 48,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 48,
+                                ),
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacing),
@@ -88,8 +88,8 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                       Text(
                         'Started at ${_formatTime(timerState.startTime!)}',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                              color: Colors.grey[600],
+                            ),
                       ),
                   ],
                 ),
@@ -114,9 +114,8 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
               width: double.infinity,
               height: AppConstants.buttonHeight,
               child: ElevatedButton(
-                onPressed: _isLoading
-                    ? null
-                    : () => _stopFeeding(timerNotifier),
+                onPressed:
+                    _isLoading ? null : () => _stopFeeding(timerNotifier),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.secondary,
                   shape: RoundedRectangleBorder(
@@ -136,7 +135,9 @@ class _FeedingTimerScreenState extends ConsumerState<FeedingTimerScreen> {
                           const SizedBox(width: AppConstants.spacing),
                           Text(
                             'End Feeding',
-                            style: Theme.of(context).textTheme.headlineMedium
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
                                 ?.copyWith(
                                   color: Theme.of(
                                     context,

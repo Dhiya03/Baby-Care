@@ -54,7 +54,9 @@ class DateSelector extends StatelessWidget {
                       children: [
                         Text(
                           DateHelper.getRelativeDateString(selectedDate),
-                          style: Theme.of(context).textTheme.headlineSmall
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).primaryColor,
@@ -63,7 +65,9 @@ class DateSelector extends StatelessWidget {
                         ),
                         Text(
                           DateFormat('EEEE, MMM d, y').format(selectedDate),
-                          style: Theme.of(context).textTheme.bodyMedium
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
                               ?.copyWith(color: Colors.grey[600]),
                           textAlign: TextAlign.center,
                         ),
@@ -164,8 +168,7 @@ class CompactDateSelector extends StatelessWidget {
       itemCount: dates.length,
       itemBuilder: (context, index) {
         final date = dates[index];
-        final isSelected =
-            DateHelper.getDateOnly(date) ==
+        final isSelected = DateHelper.getDateOnly(date) ==
             DateHelper.getDateOnly(selectedDate);
         final isToday = DateHelper.isToday(date);
 
@@ -178,8 +181,8 @@ class CompactDateSelector extends StatelessWidget {
               color: isSelected
                   ? Theme.of(context).primaryColor
                   : isToday
-                  ? Theme.of(context).primaryColor.withOpacity(0.1)
-                  : Colors.transparent,
+                      ? Theme.of(context).primaryColor.withOpacity(0.1)
+                      : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: isToday && !isSelected
                   ? Border.all(color: Theme.of(context).primaryColor, width: 1)
@@ -191,21 +194,22 @@ class CompactDateSelector extends StatelessWidget {
                 Text(
                   DateFormat('E').format(date),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isSelected
-                        ? Colors.white
-                        : Theme.of(context).textTheme.bodySmall?.color,
-                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                  ),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context).textTheme.bodySmall?.color,
+                        fontWeight:
+                            isToday ? FontWeight.bold : FontWeight.normal,
+                      ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${date.day}',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: isSelected
-                        ? Colors.white
-                        : Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+                        color: isSelected
+                            ? Colors.white
+                            : Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),

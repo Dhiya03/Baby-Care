@@ -91,7 +91,9 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                           ),
                           Text(
                             'Created: ${DateFormat('MMM d, y HH:mm').format(_originalEvent.start)}',
-                            style: Theme.of(context).textTheme.bodySmall
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
                                 ?.copyWith(color: Colors.grey[600]),
                           ),
                         ],
@@ -268,9 +270,9 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                   Text(
                     'Duration: ${_calculateDuration()}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
                   ),
                 ],
               ),

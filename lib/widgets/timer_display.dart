@@ -66,11 +66,11 @@ class TimerDisplay extends StatelessWidget {
               Text(
                 isRunning ? 'Feeding in Progress' : 'Timer',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isRunning
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey[600],
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: isRunning
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[600],
+                    ),
                 textAlign: TextAlign.center,
               ),
 
@@ -79,14 +79,16 @@ class TimerDisplay extends StatelessWidget {
               // Duration display
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 300),
-                style:
-                    Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: compact ? 32 : 48,
-                      color: isRunning
-                          ? Theme.of(context).primaryColor
-                          : Theme.of(context).textTheme.headlineLarge?.color,
-                    ) ??
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: compact ? 32 : 48,
+                          color: isRunning
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context)
+                                  .textTheme
+                                  .headlineLarge
+                                  ?.color,
+                        ) ??
                     const TextStyle(),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -150,19 +152,18 @@ class TimerDisplay extends StatelessWidget {
           Icon(
             isRunning ? Icons.baby_changing_station : Icons.timer,
             size: 20,
-            color: isRunning
-                ? Theme.of(context).primaryColor
-                : Colors.grey[600],
+            color:
+                isRunning ? Theme.of(context).primaryColor : Colors.grey[600],
           ),
           const SizedBox(width: 8),
           Text(
             DateHelper.formatTimerDuration(duration),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: isRunning
-                  ? Theme.of(context).primaryColor
-                  : Theme.of(context).textTheme.titleMedium?.color,
-            ),
+                  fontWeight: FontWeight.bold,
+                  color: isRunning
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).textTheme.titleMedium?.color,
+                ),
           ),
         ],
       ),
@@ -273,8 +274,7 @@ class MilestoneTimerDisplay extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: milestones.map((milestone) {
             final isReached = currentMinutes >= milestone;
-            final isCurrent =
-                currentMinutes >= milestone - 1 &&
+            final isCurrent = currentMinutes >= milestone - 1 &&
                 currentMinutes < milestone + 1;
 
             return Container(
@@ -305,9 +305,8 @@ class MilestoneTimerDisplay extends StatelessWidget {
                       color: isReached
                           ? Theme.of(context).primaryColor
                           : Colors.grey[600],
-                      fontWeight: isReached
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight:
+                          isReached ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ],
