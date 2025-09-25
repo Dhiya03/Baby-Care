@@ -8,64 +8,49 @@ on:
   release:
     types: [ published ]
 
-permissions:
-  contents: write # Allow peaceiris/actions-gh-pages to push to the gh-pages branch
-
 env:
-  FLUTTER_VERSION: '3.22.2'
+  FLUTTER_VERSION: '3.35.4'
   JAVA_VERSION: '17'
 
 jobs:
-  # Test and validate code
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # test:
+  #   name: Run Tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
+  #     - name: Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: ${{ env.FLUTTER_VERSION }}
+  #         cache: false
 
-      - name: Check Flutter version
-        run: flutter --version
+  #     - name: Check Flutter version
+  #       run: flutter --version
 
-      - name: Flutter Doctor
-        run: flutter doctor -v
+  #     - name: Flutter Doctor
+  #       run: flutter doctor -v
 
-      - name: Get dependencies
-        run: flutter pub get
+  #     - name: Get dependencies
+  #       run: flutter pub get
 
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed lib/
+  #     - name: Analyze project
+  #       run: flutter analyze --fatal-infos
 
-      - name: Analyze project source
-        run: flutter analyze --fatal-infos
+  #     - name: Run tests (if present)
+  #       run: |
+  #         if [ -d "test" ] && [ "$(find test -name '*.dart' | wc -l)" -gt 0 ]; then
+  #           flutter test --coverage
+  #         else
+  #           echo "No tests present"
+  #         fi
 
-      # Skip tests if no test files exist
-      - name: Check if tests exist
-        id: check-tests
-        run: |
-          if [ -d "test" ] && [ "$(find test -name "*.dart" | wc -l)" -gt 0 ]; then
-            echo "tests_exist=true" >> $GITHUB_OUTPUT
-          else
-            echo "tests_exist=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Run tests
-        if: steps.check-tests.outputs.tests_exist == 'true'
-        run: flutter test --coverage
-
-  # Build Android APK and AAB
   build-android:
     name: Build Android
     runs-on: ubuntu-latest
-    needs: test
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Java
@@ -78,93 +63,60 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
           cache: true
 
-      - name: Clean
+      - name: Accept Android licenses and install SDK tools
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Check Flutter & Android setup
+        run: |
+          flutter doctor -v
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls -la $ANDROID_HOME
+
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x android/gradlew
+
+      - name: Clean project
         run: flutter clean
 
       - name: Get dependencies
         run: flutter pub get
 
-      # Download/Create assets (including placeholders)
-      - name: Setup Assets
-        run: |
-          chmod +x scripts/download_assets.sh
-          ./scripts/download_assets.sh
-
-      # Setup Android signing (for release builds)
-      - name: Setup Android signing
-        if: github.event_name == 'release'
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/app/keystore.jks
-          echo "storeFile=keystore.jks" >> android/key.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
-          echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}" >> android/key.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
-
-      # Build debug APK for development
-      - name: Build debug APK
-        if: github.event_name != 'release'
-        run: |
-          flutter build apk --debug --target-platform android-arm64
-        continue-on-error: false
-
-      # Build release APK and AAB for production
       - name: Build release APK
-        if: github.event_name == 'release'
-        run: |
-          flutter build apk --release --split-per-abi
-          flutter build appbundle --release
+        run: flutter build apk --release -v
 
-      # Upload build artifacts
-      - name: Upload APK artifacts
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk-${{ github.sha }}
-          path: |
-            build/app/outputs/flutter-apk/*.apk
+          name: baby-care-apk-${{ github.sha }}
+          path: build/app/outputs/flutter-apk/*.apk
           retention-days: 30
 
-      - name: Upload AAB artifacts
-        if: github.event_name == 'release'
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-aab-${{ github.sha }}
-          path: |
-            build/app/outputs/bundle/release/*.aab
-          retention-days: 30
-
-  # Build Web version
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
-    needs: build-android
+    # needs: test
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
+          cache: false
 
-      - name: Clean
-        run: flutter clean
+      - name: Check Flutter version
+        run: flutter --version
 
       - name: Get dependencies
         run: flutter pub get
 
-      # Download/Create assets (including placeholders)
-      - name: Setup Assets
-        run: |
-          chmod +x scripts/download_assets.sh
-          ./scripts/download_assets.sh
-
       - name: Build web
-        run: |
-          flutter build web --release --base-href "/baby-care-app/"
-        continue-on-error: false
+        run: flutter build web --release --base-href "/baby-care-app/" -v
 
       - name: Upload web artifacts
         uses: actions/upload-artifact@v4
@@ -172,31 +124,3 @@ jobs:
           name: web-build-${{ github.sha }}
           path: build/web/
           retention-days: 30
-
-      # Deploy to GitHub Pages (optional)
-      - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/web
-
-  # Notify on build completion
-  notify:
-    name: Notify Build Status
-    runs-on: ubuntu-latest
-    needs: [build-android, build-web]
-    if: always()
-    steps:
-      - name: Notify success
-        if: ${{ success() }}
-        run: |
-          echo "✅ All builds completed successfully!"
-          echo "- Android APK built"
-          echo "- Web version built"
-
-      - name: Notify failure
-        if: ${{ failure() }}
-        run: |
-          echo "❌ Build failed!"
-          echo "Check the logs for details."

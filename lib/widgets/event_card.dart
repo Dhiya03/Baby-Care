@@ -68,12 +68,6 @@ class EventCard extends StatelessWidget {
                                 horizontal: 8,
                                 vertical: 2,
                               ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).primaryColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
                               child: Text(
                                 event.displayDuration,
                                 style: Theme.of(context)
@@ -171,7 +165,7 @@ class EventCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.1),
+        color: iconColor.withAlpha(26), // 10% opacity
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(iconData, color: iconColor, size: 24),

@@ -91,4 +91,40 @@ class DayHistory {
 
   @override
   int get hashCode => Object.hash(date, events.length);
+
+  // Convert to savable string (e.g. for file or web storage)
+String toFile() {
+  final buffer = StringBuffer();
+  for (var event in events) {
+    buffer.writeln(event.toFileLine());
+  }
+  return buffer.toString();
+}
+
+// Parse from file content
+static DayHistory fromFile(String content, DateTime date) {
+  final lines = content.trim().split('\n');
+  final events = <Event>[];
+  int counter = 0;
+  for (var line in lines) {
+    if (line.trim().isEmpty) continue;
+    events.add(Event.fromFileLine(line, 'event_$counter'));
+    counter++;
+  }
+  return DayHistory(date: date, events: events);
+}
+
+Map<String, dynamic> toJson() => {
+  'date': date.toIso8601String(),
+  'events': events.map((e) => e.toJson()).toList(),
+};
+
+factory DayHistory.fromJson(Map<String, dynamic> json) => DayHistory(
+  date: DateTime.parse(json['date']),
+  events: (json['events'] as List)
+      .map((e) => Event.fromJson(e))
+      .toList(),
+);
+
+
 }

@@ -43,7 +43,7 @@ rm -rf build/
 echo -e "${BLUE}⚙️ Updating Gradle wrapper...${NC}"
 cd android
 if [ -f "gradlew" ]; then
-    ./gradlew wrapper --gradle-version 8.3 --distribution-type all
+    ./gradlew wrapper --gradle-version 8.7 --distribution-type all
 else
     echo -e "${YELLOW}⚠️ Gradle wrapper not found, skipping update${NC}"
 fi
@@ -115,7 +115,7 @@ echo ""
 echo -e "${GREEN}🎉 Migration Summary${NC}"
 echo -e "${BLUE}==================${NC}"
 echo -e "✅ Cleaned old build artifacts"
-echo -e "✅ Updated Gradle wrapper to 8.3"
+echo -e "✅ Updated Gradle wrapper to 8.7"
 echo -e "✅ Verified Android Embedding V2 configuration"
 echo -e "✅ Tested Android build successfully"
 echo ""

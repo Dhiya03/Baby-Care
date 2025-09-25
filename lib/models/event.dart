@@ -62,7 +62,7 @@ class Event {
 
   // Parse from file line
   static Event fromFileLine(String line, String id) {
-    final parts = line.split(',');
+    final parts = line.split(','); // type,start,end,duration,notes
     if (parts.length < 4) {
       throw FormatException('Invalid event line format: $line');
     }
@@ -71,7 +71,7 @@ class Event {
       id: id,
       type: parts[0],
       start: DateTime.parse(parts[1]),
-      end: parts[2].isEmpty ? null : DateTime.parse(parts[2]),
+      end: parts.length > 2 && parts[2].isNotEmpty ? DateTime.parse(parts[2]) : null,
       durationMinutes: int.tryParse(parts[3]) ?? 0,
       notes: parts.length > 4
           ? parts.sublist(4).join(',')
@@ -137,4 +137,23 @@ class Event {
   int get hashCode {
     return Object.hash(id, type, start, end, durationMinutes, notes);
   }
+
+  Map<String, dynamic> toJson() => {
+  'id': id,
+  'type': type,
+  'start': start.toIso8601String(),
+  'end': end?.toIso8601String(),
+  'durationMinutes': durationMinutes,
+  'notes': notes,
+};
+
+factory Event.fromJson(Map<String, dynamic> json) => Event(
+  id: json['id'],
+  type: json['type'],
+  start: DateTime.parse(json['start']),
+  end: json['end'] != null ? DateTime.parse(json['end']) : null,
+  durationMinutes: json['durationMinutes'],
+  notes: json['notes'] ?? AppConstants.defaultNotes,
+);
+
 }

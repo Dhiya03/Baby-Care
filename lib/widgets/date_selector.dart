@@ -45,10 +45,6 @@ class DateSelector extends StatelessWidget {
                       vertical: AppConstants.spacing / 2,
                       horizontal: AppConstants.spacing,
                     ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -178,11 +174,7 @@ class CompactDateSelector extends StatelessWidget {
             width: 60,
             margin: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? Theme.of(context).primaryColor
-                  : isToday
-                      ? Theme.of(context).primaryColor.withOpacity(0.1)
-                      : Colors.transparent,
+              color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: isToday && !isSelected
                   ? Border.all(color: Theme.of(context).primaryColor, width: 1)
@@ -222,8 +214,7 @@ class CompactDateSelector extends StatelessWidget {
   Widget _buildWeekSelector(BuildContext context) {
     return Row(
       children: [
-        IconButton(
-          onPressed: () => _changeWeek(-1),
+        IconButton(onPressed: () => _changeWeek(-1),
           icon: const Icon(Icons.chevron_left),
         ),
         Expanded(

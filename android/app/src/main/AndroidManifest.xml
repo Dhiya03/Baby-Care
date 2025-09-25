@@ -1,82 +1,33 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"   package="com.babycareapp">
-
-    <!-- Required permissions -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.babycareapp">
 
     <application
-        android:label="${appName}"
-        android:name="${applicationName}"
-        android:icon="@drawable/ic_launcher"
-        android:allowBackup="true">
+        android:label="Baby Care"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:allowBackup="true"
+        android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config">
 
-        <!-- Main Activity (Flutter V2 Embedding) -->
-<activity
-    android:name=".MainActivity"
-    android:exported="true"
-    android:launchMode="singleTop"
-    android:theme="@style/LaunchTheme"
-    android:configChanges="orientation|keyboardHidden|screenSize|locale|layoutDirection|fontScale|density|uiMode"
-    android:windowSoftInputMode="adjustResize">
-    <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
-    </intent-filter>
-</activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
 
-
-        <!-- Feeding Timer Foreground Service -->
-        <service
-            android:name=".services.FeedingTimerService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="dataSync|connectedDevice" />
-
-        <!-- Quick Settings Tile -->
-        <service
-            android:name=".services.BabyCareQuickTileService"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:exported="true">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </service>
+        </activity>
 
-        <!-- Notification Action Receiver -->
-        <receiver
-            android:name=".receivers.NotificationActionReceiver"
-            android:enabled="true"
-            android:exported="false" />
-
-        <!-- Boot Receiver -->
-        <receiver
-            android:name=".receivers.BootReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
-        </receiver>
-
-        <!-- File Provider (for history export) -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.babycareapp.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
-        <!-- Flutter Embedding V2 -->
+        <!-- Flutter V2 Embedding flag -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-            
+
     </application>
 </manifest>

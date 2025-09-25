@@ -38,7 +38,7 @@ class ExportServiceWeb implements ExportService {
         final content = await _storageService.getDayHistoryContent(current);
         if (content != null && content.isNotEmpty) {
           buffer.writeln(content);
-          buffer.writeln('\n' + ('-' * 50) + '\n');
+          buffer.writeln('\n${'-' * 50}\n');
           fileCount++;
         }
       }
@@ -86,7 +86,7 @@ class ExportServiceWeb implements ExportService {
         final content = await _storageService.getDayHistoryContent(date);
         if (content != null && content.isNotEmpty) {
           buffer.writeln(content);
-          buffer.writeln('\n' + ('-' * 50) + '\n');
+          buffer.writeln('\n${'-' * 50}\n');
         }
       }
 

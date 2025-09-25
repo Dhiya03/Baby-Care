@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
 
 class AppTheme {
   // Color constants
@@ -42,20 +43,13 @@ class AppTheme {
           ),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: lightPink,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
         ),
       ),
-      //  cardTheme: CardThemeData(
-      //   color: lightPink,
-      //   elevation: 2,
-      //   shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.circular(16),
-      //   ),
-      // ),
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
           fontFamily: 'Nunito',

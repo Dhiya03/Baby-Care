@@ -260,7 +260,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
         if (_originalEvent.isFeeding && _endDateTime != null) ...[
           const SizedBox(height: AppConstants.spacing / 2),
           Card(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
             child: Padding(
               padding: const EdgeInsets.all(AppConstants.spacing),
               child: Row(
@@ -346,6 +346,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
   Future<void> _selectEndDate() async {
     if (!_originalEvent.isFeeding) return;
 
+    final currentContext = context;
     final date = await showDatePicker(
       context: context,
       initialDate: _endDateTime ?? _startDateTime,
@@ -353,6 +354,8 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
       lastDate: DateTime.now(),
     );
     if (date != null) {
+      if (!currentContext.mounted) return;
+
       final newEndTime = DateTime(
         date.year,
         date.month,
@@ -365,7 +368,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
           _endDateTime = newEndTime;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(currentContext).showSnackBar(
           const SnackBar(
             content: Text('End time must be after start time'),
             backgroundColor: Colors.orange,
@@ -377,11 +380,15 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
 
   Future<void> _selectEndTime() async {
     if (!_originalEvent.isFeeding) return;
+
+    final currentContext = context;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(_endDateTime ?? _startDateTime),
     );
     if (time != null) {
+      if (!currentContext.mounted) return;
+
       final newEndTime = DateTime(
         _endDateTime?.year ?? _startDateTime.year,
         _endDateTime?.month ?? _startDateTime.month,
@@ -395,7 +402,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
           _endDateTime = newEndTime;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(currentContext).showSnackBar(
           const SnackBar(
             content: Text('End time must be after start time'),
             backgroundColor: Colors.orange,
@@ -407,6 +414,8 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
 
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final nav = Navigator.of(context);
 
     setState(() {
       _isLoading = true;
@@ -432,24 +441,23 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
           .read(eventActionsProvider)
           .updateEvent(_originalDate, updatedEvent);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Event updated successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.of(context).pop();
-      }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Event updated successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      nav.pop();
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error updating event: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error updating event: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -460,6 +468,8 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
   }
 
   void _deleteEvent() {
+    final nav = Navigator.of(context);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -474,7 +484,7 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
+              Navigator.of(context).pop(); // Close dialog
 
               setState(() {
                 _isLoading = true;
@@ -485,24 +495,22 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
                     .read(eventActionsProvider)
                     .deleteEvent(_originalDate, _originalEvent.id);
 
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Event deleted successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  Navigator.of(context).pop();
-                }
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Event deleted successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                nav.pop();
               } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error deleting event: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error deleting event: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               } finally {
                 if (mounted) {
                   setState(() {

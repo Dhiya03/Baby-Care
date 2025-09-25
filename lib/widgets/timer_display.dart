@@ -39,8 +39,8 @@ class TimerDisplay extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Theme.of(context).primaryColor.withOpacity(0.1),
-                      Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                      Theme.of(context).primaryColor.withAlpha(26), // 10% opacity
+                      Theme.of(context).colorScheme.secondary.withAlpha(26), // 10% opacity
                     ],
                   )
                 : null,
@@ -95,12 +95,6 @@ class TimerDisplay extends StatelessWidget {
                     horizontal: AppConstants.spacing,
                     vertical: AppConstants.spacing / 2,
                   ),
-                  decoration: BoxDecoration(
-                    color: isRunning
-                        ? Theme.of(context).primaryColor.withOpacity(0.1)
-                        : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
                   child: Text(
                     DateHelper.formatTimerDuration(duration),
                     textAlign: TextAlign.center,
@@ -136,15 +130,6 @@ class TimerDisplay extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
         horizontal: AppConstants.spacing,
         vertical: AppConstants.spacing / 2,
-      ),
-      decoration: BoxDecoration(
-        color: isRunning
-            ? Theme.of(context).primaryColor.withOpacity(0.1)
-            : Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: isRunning
-            ? Border.all(color: Theme.of(context).primaryColor, width: 1)
-            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

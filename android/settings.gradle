@@ -9,18 +9,17 @@ pluginManagement {
         def properties = new Properties()
         file("local.properties").withInputStream { properties.load(it) }
         def flutterSdk = properties.getProperty("flutter.sdk")
-        assert flutterSdk != null, "flutter.sdk not set in local.properties"
+        assert flutterSdk != null : "flutter.sdk not set in local.properties"
         return flutterSdk
     }()
-
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
+    plugins {
+        id "com.android.application" version "8.5.2" apply false
+        id "org.jetbrains.kotlin.android" version "1.9.25" apply false
+        id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
+    }
 }
 
-plugins {
-    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
-    id "com.android.application" version "8.1.2" apply false
-    id "org.jetbrains.kotlin.android" version "1.9.10" apply false
-}
-
+rootProject.name = "baby_care_app"
 include ":app"
