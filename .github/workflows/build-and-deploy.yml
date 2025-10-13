@@ -66,9 +66,10 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Accept Android licenses and install SDK tools
+      - name: Set up Android SDK
         run: |
-          yes | sdkmanager --licenses || true
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Check Flutter & Android setup
